@@ -9,12 +9,17 @@
 #import <OpenGLES/ES2/gl.h>
 
 #import "MFShaderHelper.h"
+#import "MFBezierCurvesTool.h"
 
 #import "GLPaintView.h"
 
 typedef struct {
     float positionCoord[3];
 } Vertex;
+
+CGPoint middlePoint(CGPoint point1, CGPoint point2) {
+    return CGPointMake((point1.x + point2.x) / 2, (point1.y + point2.y) / 2);
+}
 
 @interface GLPaintView ()
 
@@ -32,6 +37,8 @@ typedef struct {
 @property (nonatomic, assign) GLuint brushTextureID; // 笔触纹理
 
 @property (nonatomic, strong) CAEAGLLayer *glLayer;
+
+@property (nonatomic, assign) CGPoint fromPoint; // 贝塞尔曲线的起始点
 
 @end
 
@@ -76,22 +83,46 @@ typedef struct {
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [super touchesBegan:touches withEvent:event];
+    
+    CGPoint point = [[touches anyObject] locationInView:self];
+    [self genVerticesWithPoints:@[@(point)]];
+    [self renderPoints];
+    self.fromPoint = point;
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [super touchesMoved:touches withEvent:event];
     
-    CGPoint point = [[touches anyObject] locationInView:self];
-    [self genVerticesWithPoint:point];
-    [self renderPoints];
+    [self addPointWithTouches:touches];
 }
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [super touchesEnded:touches withEvent:event];
+    
+    [self addPointWithTouches:touches];
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [super touchesCancelled:touches withEvent:event];
+    
+    [self addPointWithTouches:touches];
+}
+
+- (void)addPointWithTouches:(NSSet<UITouch *> *)touches {
+    UITouch *currentTouch = [touches anyObject];
+    CGPoint previousPoint = [currentTouch previousLocationInView:self];
+    CGPoint currentPoint = [currentTouch locationInView:self];
+    
+    CGPoint from = self.fromPoint;
+    CGPoint to = middlePoint(previousPoint, currentPoint);
+    CGPoint control = previousPoint;
+    
+    NSArray <NSValue *>*points = [MFBezierCurvesTool pointsWithFrom:from to:to control:control];
+    
+    [self genVerticesWithPoints:points];
+    [self renderPoints];
+    
+    self.fromPoint = to;
 }
 
 #pragma mark - Private
@@ -175,8 +206,8 @@ typedef struct {
 }
 
 // 生成本次需要绘制的顶点
-- (void)genVerticesWithPoint:(CGPoint)point {
-    self.vertexCount = 1;
+- (void)genVerticesWithPoints:(NSArray <NSValue *>*)points {
+    self.vertexCount = (int)[points count];
     
     // 容量不足，扩容
     if (self.vertexCount > self.currentVertexSize) {
@@ -188,7 +219,7 @@ typedef struct {
     }
     // 遍历赋值
     for (int i = 0; i < self.vertexCount; ++i) {
-        self.vertices[i] = [self vertexWithPoint:point];
+        self.vertices[i] = [self vertexWithPoint:points[i].CGPointValue];
     }
 }
 

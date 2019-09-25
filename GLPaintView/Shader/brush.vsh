@@ -2,5 +2,5 @@ attribute vec4 Position;
 
 void main (void) {
     gl_Position = Position;
-    gl_PointSize = 100.0;
+    gl_PointSize = 40.0;
 }
