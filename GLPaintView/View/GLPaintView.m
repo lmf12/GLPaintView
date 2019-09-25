@@ -19,6 +19,8 @@ typedef struct {
 @interface GLPaintView ()
 
 @property (nonatomic, assign) Vertex *vertices; // 顶点数组
+@property (nonatomic, assign) int currentVertexSize; // 记录顶点数组的容量，当容量不足的时候才扩容，避免频繁申请内存空间
+@property (nonatomic, assign) int vertexCount;  //  顶点数
 
 @property (nonatomic, strong) EAGLContext *context;
 
@@ -72,6 +74,26 @@ typedef struct {
 
 #pragma mark - Touches
 
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [super touchesBegan:touches withEvent:event];
+}
+
+- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [super touchesMoved:touches withEvent:event];
+    
+    CGPoint point = [[touches anyObject] locationInView:self];
+    [self genVerticesWithPoint:point];
+    [self renderPoints];
+}
+
+- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [super touchesEnded:touches withEvent:event];
+}
+
+- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [super touchesCancelled:touches withEvent:event];
+}
+
 #pragma mark - Private
 
 - (void)commonInit {
@@ -79,19 +101,6 @@ typedef struct {
     
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     [EAGLContext setCurrentContext:self.context];
-    
-    // 创建顶点数组
-    self.vertices = malloc(sizeof(Vertex) * 4); // 4 个顶点
-    
-    self.vertices[0] = (Vertex){{-0.5, 0.5, 0}};
-    self.vertices[1] = (Vertex){{-0.5, -0.5, 0}};
-    self.vertices[2] = (Vertex){{0.5, 0.5, 0}};
-    self.vertices[3] = (Vertex){{0.5, -0.5, 0}};
-    
-    // 加载笔触纹理
-    NSString *imagePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"brush.png"];
-    UIImage *image = [UIImage imageWithContentsOfFile:imagePath];
-    self.brushTextureID = [MFShaderHelper createTextureWithImage:image];
     
     // 创建着色器程序
     [self genProgram];
@@ -102,6 +111,9 @@ typedef struct {
     // 绑定纹理输出的层
     [self bindRenderLayer:self.glLayer];
     
+    // 初始化笔触纹理
+    [self setBrushTextureWithImageName:@"brush.png"];
+    
     // 指定窗口大小
     glViewport(0, 0, self.drawableWidth, self.drawableHeight);
     
@@ -109,8 +121,8 @@ typedef struct {
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     
-    // 开始渲染
-    [self display];
+    // 清除画布
+    [self clear];
 }
 
 // 创建输出层
@@ -126,6 +138,7 @@ typedef struct {
 // 创建 program
 - (void)genProgram {
     self.program = [MFShaderHelper programWithShaderName:@"brush"];
+    glUseProgram(self.program);
 }
 
 // 创建 buffer
@@ -137,14 +150,53 @@ typedef struct {
 
 // 绑定图像要输出的 layer
 - (void)bindRenderLayer:(CALayer <EAGLDrawable> *)layer {
-    glBindRenderbuffer(GL_RENDERBUFFER, _renderBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, self.renderBuffer);
     [self.context renderbufferStorage:GL_RENDERBUFFER fromDrawable:layer];
     
-    glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, self.frameBuffer);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER,
                               GL_COLOR_ATTACHMENT0,
                               GL_RENDERBUFFER,
-                              _renderBuffer);
+                              self.renderBuffer);
+}
+
+// 通过笔触的图片，来设置当前使用的笔触纹理
+- (void)setBrushTextureWithImageName:(NSString *)imageName {
+    // 加载纹理
+    NSString *imagePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"brush.png"];
+    UIImage *image = [UIImage imageWithContentsOfFile:imagePath];
+    self.brushTextureID = [MFShaderHelper createTextureWithImage:image];
+    
+    // 将纹理设置到着色器中
+    GLuint textureSlot = glGetUniformLocation(self.program, "Texture");
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, self.brushTextureID);
+    glUniform1i(textureSlot, 0);
+}
+
+// 生成本次需要绘制的顶点
+- (void)genVerticesWithPoint:(CGPoint)point {
+    self.vertexCount = 1;
+    
+    // 容量不足，扩容
+    if (self.vertexCount > self.currentVertexSize) {
+        if (self.vertices) {
+            free(self.vertices);
+        }
+        self.vertices = malloc(sizeof(Vertex) * self.vertexCount);
+        self.currentVertexSize = self.vertexCount;
+    }
+    // 遍历赋值
+    for (int i = 0; i < self.vertexCount; ++i) {
+        self.vertices[i] = [self vertexWithPoint:point];
+    }
+}
+
+// 通过 UIKit 的点坐标，转化成 OpenGL 的顶点
+- (Vertex)vertexWithPoint:(CGPoint)point {
+    float x = (point.x / self.frame.size.width) * 2 - 1;
+    float y = 1 - (point.y / self.frame.size.height) * 2;
+    return (Vertex){{x, y, 0}};
 }
 
 // 获取渲染缓存宽度
@@ -178,31 +230,26 @@ typedef struct {
     }
 }
 
-// 刷新视图
-- (void)display {
-    glUseProgram(self.program);
-    
+// 渲染 vertices 中保存的顶点
+- (void)renderPoints {
     GLuint positionSlot = glGetAttribLocation(self.program, "Position");
-    GLuint textureSlot = glGetUniformLocation(self.program, "Texture");
-    
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, self.brushTextureID);
-    glUniform1i(textureSlot, 0);
     
     glBindBuffer(GL_ARRAY_BUFFER, self.vertexBuffer);
-    GLsizeiptr bufferSizeBytes = sizeof(Vertex) * 4;
+    GLsizeiptr bufferSizeBytes = sizeof(Vertex) * self.vertexCount;
     glBufferData(GL_ARRAY_BUFFER, bufferSizeBytes, self.vertices, GL_DYNAMIC_DRAW);
     
     glEnableVertexAttribArray(positionSlot);
     glVertexAttribPointer(positionSlot, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL + offsetof(Vertex, positionCoord));
     
-    // 将背景清除成白色
-    glClearColor (1.0, 1.0, 1.0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
-    
-    glDrawArrays(GL_POINTS, 0, 4);
+    glDrawArrays(GL_POINTS, 0, self.vertexCount);
     
     [self.context presentRenderbuffer:GL_RENDERBUFFER];
+}
+
+// 清除画布
+- (void)clear {
+    glClearColor (1.0, 1.0, 1.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 @end
