@@ -113,6 +113,11 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
     CGPoint previousPoint = [currentTouch previousLocationInView:self];
     CGPoint currentPoint = [currentTouch locationInView:self];
     
+    // 起始点和当前的点重合，不需要绘制
+    if (CGPointEqualToPoint(self.fromPoint, currentPoint)) {
+        return;
+    }
+    
     CGPoint from = self.fromPoint;
     CGPoint to = middlePoint(previousPoint, currentPoint);
     CGPoint control = previousPoint;
