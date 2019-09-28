@@ -21,6 +21,8 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
     return CGPointMake((point1.x + point2.x) / 2, (point1.y + point2.y) / 2);
 }
 
+static NSInteger const kDefaultBrushSize = 40;
+
 @interface GLPaintView ()
 
 @property (nonatomic, strong) GLPaintTexture *paintTexture;
@@ -75,6 +77,13 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
     return self;
 }
 
+#pragma mark - Public
+
+- (void)clear {
+    [self.paintTexture clear];
+    [self display];
+}
+
 #pragma mark - Touches
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
@@ -125,9 +134,29 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
     self.fromPoint = to;
 }
 
+#pragma mark - Custom Accessor
+
+- (void)setBrushSize:(CGFloat)brushSize {
+    _brushSize = brushSize;
+}
+
+- (void)setBrushColor:(UIColor *)brushColor {
+    _brushColor = brushColor;
+    
+    [self.paintTexture setColor:brushColor];
+}
+
+- (void)setBrushMode:(GLPaintViewBrushMode)brushMode {
+    _brushMode = brushMode;
+}
+
 #pragma mark - Private
 
 - (void)commonInit {
+    self.brushSize = kDefaultBrushSize;
+    self.brushColor = [UIColor blackColor];
+    self.brushMode = MFPaintViewBrushModePaint;
+    
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     [EAGLContext setCurrentContext:self.context];
     

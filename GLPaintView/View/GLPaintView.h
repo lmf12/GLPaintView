@@ -8,6 +8,28 @@
 
 #import <UIKit/UIKit.h>
 
+/**
+ 笔刷模式
+ 
+ - MFPaintViewBrushModePaint: 画笔
+ - MFPaintViewBrushModeEraser: 橡皮擦
+ */
+typedef NS_ENUM(NSUInteger, GLPaintViewBrushMode) {
+    MFPaintViewBrushModePaint,
+    MFPaintViewBrushModeEraser,
+};
+
 @interface GLPaintView : UIView
 
+/// 笔刷尺寸，默认 40
+@property (nonatomic, assign) CGFloat brushSize;
+/// 笔刷颜色，默认黑色
+@property (nonatomic, strong) UIColor *brushColor;
+/// 笔刷模式，默认画笔
+@property (nonatomic, assign) GLPaintViewBrushMode brushMode;
+
+/// 清空画布
+- (void)clear;
+
 @end
+

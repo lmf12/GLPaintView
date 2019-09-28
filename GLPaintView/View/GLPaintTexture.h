@@ -26,4 +26,10 @@
 /// 绘制顶点，顶点是归一化的坐标
 - (void)drawPoints:(NSArray <NSValue *>*)points;
 
+/// 设置颜色
+- (void)setColor:(UIColor *)color;
+
+/// 清除画布
+- (void)clear;
+
 @end

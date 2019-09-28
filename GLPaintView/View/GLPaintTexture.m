@@ -8,6 +8,8 @@
 
 #import "MFShaderHelper.h"
 
+#import "UIColor+Extension.h"
+
 #import "GLPaintTexture.h"
 
 typedef struct {
@@ -88,6 +90,26 @@ typedef struct {
     }
     // 渲染
     [self renderPoints];
+}
+
+- (void)setColor:(UIColor *)color {
+    MFColor mfColor = [color mf_color];
+    
+    glUseProgram(self.program);
+    GLuint rSlot = glGetUniformLocation(self.program, "R");
+    GLuint gSlot = glGetUniformLocation(self.program, "G");
+    GLuint bSlot = glGetUniformLocation(self.program, "B");
+    
+    glUniform1f(rSlot, mfColor.r);
+    glUniform1f(gSlot, mfColor.g);
+    glUniform1f(bSlot, mfColor.b);
+}
+
+- (void)clear {
+    glBindFramebuffer(GL_FRAMEBUFFER, self.frameBuffer);
+    
+    glClearColor (1.0, 1.0, 1.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 #pragma mark - Private
@@ -199,12 +221,6 @@ typedef struct {
     glVertexAttribPointer(positionSlot, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL + offsetof(Vertex, positionCoord));
     
     glDrawArrays(GL_POINTS, 0, self.vertexCount);
-}
-
-// 清除画布
-- (void)clear {
-    glClearColor (1.0, 1.0, 1.0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 @end

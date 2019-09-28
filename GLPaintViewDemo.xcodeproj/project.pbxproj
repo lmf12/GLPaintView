@@ -16,6 +16,7 @@
 		E86CCEDE233E6AD0007DF53E /* GLPaintTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = E86CCEDD233E6AD0007DF53E /* GLPaintTexture.m */; };
 		E86CCEE1233E7A45007DF53E /* normal.fsh in Resources */ = {isa = PBXBuildFile; fileRef = E86CCEDF233E7A45007DF53E /* normal.fsh */; };
 		E86CCEE2233E7A45007DF53E /* normal.vsh in Resources */ = {isa = PBXBuildFile; fileRef = E86CCEE0233E7A45007DF53E /* normal.vsh */; };
+		E89EB9AB233F5DD100BB87D8 /* UIColor+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = E89EB9AA233F5DD100BB87D8 /* UIColor+Extension.m */; };
 		E8EAA81223361C3800E1B0E8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E8EAA81123361C3800E1B0E8 /* AppDelegate.m */; };
 		E8EAA81523361C3800E1B0E8 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E8EAA81423361C3800E1B0E8 /* ViewController.m */; };
 		E8EAA81823361C3800E1B0E8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E8EAA81623361C3800E1B0E8 /* Main.storyboard */; };
@@ -38,6 +39,8 @@
 		E86CCEDD233E6AD0007DF53E /* GLPaintTexture.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GLPaintTexture.m; sourceTree = "<group>"; };
 		E86CCEDF233E7A45007DF53E /* normal.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = normal.fsh; sourceTree = "<group>"; };
 		E86CCEE0233E7A45007DF53E /* normal.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = normal.vsh; sourceTree = "<group>"; };
+		E89EB9A9233F5DD100BB87D8 /* UIColor+Extension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIColor+Extension.h"; sourceTree = "<group>"; };
+		E89EB9AA233F5DD100BB87D8 /* UIColor+Extension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Extension.m"; sourceTree = "<group>"; };
 		E8EAA80D23361C3800E1B0E8 /* GLPaintViewDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GLPaintViewDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8EAA81023361C3800E1B0E8 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E8EAA81123361C3800E1B0E8 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -64,6 +67,7 @@
 		E80B83862336273700BA9CE7 /* GLPaintView */ = {
 			isa = PBXGroup;
 			children = (
+				E89EB9A8233F5DA200BB87D8 /* Category */,
 				E80B83982337841C00BA9CE7 /* Image */,
 				E80B838F233756EB00BA9CE7 /* Shader */,
 				E80B83882336291900BA9CE7 /* Utils */,
@@ -111,6 +115,15 @@
 				E80B83992337841C00BA9CE7 /* brush.png */,
 			);
 			path = Image;
+			sourceTree = "<group>";
+		};
+		E89EB9A8233F5DA200BB87D8 /* Category */ = {
+			isa = PBXGroup;
+			children = (
+				E89EB9A9233F5DD100BB87D8 /* UIColor+Extension.h */,
+				E89EB9AA233F5DD100BB87D8 /* UIColor+Extension.m */,
+			);
+			path = Category;
 			sourceTree = "<group>";
 		};
 		E8EAA80423361C3800E1B0E8 = {
@@ -225,6 +238,7 @@
 				E8EAA81523361C3800E1B0E8 /* ViewController.m in Sources */,
 				E80B838E2336297600BA9CE7 /* GLPaintView.m in Sources */,
 				E80B838B2336291900BA9CE7 /* MFShaderHelper.m in Sources */,
+				E89EB9AB233F5DD100BB87D8 /* UIColor+Extension.m in Sources */,
 				E8EAA82023361C3800E1B0E8 /* main.m in Sources */,
 				E8EAA81223361C3800E1B0E8 /* AppDelegate.m in Sources */,
 				E86CCEDE233E6AD0007DF53E /* GLPaintTexture.m in Sources */,
