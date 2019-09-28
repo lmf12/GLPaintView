@@ -150,6 +150,13 @@ typedef struct {
     NSString *imagePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:imageName];
     UIImage *image = [UIImage imageWithContentsOfFile:imagePath];
     self.brushTextureID = [MFShaderHelper createTextureWithImage:image];
+    
+    glUseProgram(self.program);
+    GLuint textureSlot = glGetUniformLocation(self.program, "Texture");
+    
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, self.brushTextureID);
+    glUniform1i(textureSlot, 0);
 }
 
 // 获取渲染缓存宽度
@@ -182,12 +189,7 @@ typedef struct {
     glBindFramebuffer(GL_FRAMEBUFFER, self.frameBuffer);
     
     glUseProgram(self.program);
-    GLuint textureSlot = glGetUniformLocation(self.program, "Texture");
     GLuint positionSlot = glGetAttribLocation(self.program, "Position");
-    
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, self.brushTextureID);
-    glUniform1i(textureSlot, 0);
     
     glBindBuffer(GL_ARRAY_BUFFER, self.vertexBuffer);
     GLsizeiptr bufferSizeBytes = sizeof(Vertex) * self.vertexCount;

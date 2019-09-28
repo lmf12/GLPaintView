@@ -145,6 +145,7 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
     
     self.paintTexture = [[GLPaintTexture alloc] initWithContext:self.context
                                                            size:CGSizeMake(self.drawableWidth, self.drawableHeight)];
+    [self bindTexture];
 }
 
 // 创建 program
@@ -181,6 +182,16 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
                               self.renderBuffer);
 }
 
+// 绑定要绘制的纹理
+- (void)bindTexture {
+    glUseProgram(self.program);
+    GLuint textureSlot = glGetUniformLocation(self.program, "Texture");
+    
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, self.paintTexture.textureID);
+    glUniform1i(textureSlot, 1);
+}
+
 // 绘制数据到屏幕
 - (void)drawPointsToScreen:(NSArray<NSValue *> *)points {
     [self.paintTexture drawPoints:points];
@@ -193,13 +204,8 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
     
     glUseProgram(self.program);
     
-    GLuint textureSlot = glGetUniformLocation(self.program, "Texture");
     GLuint positionSlot = glGetAttribLocation(self.program, "Position");
     GLuint textureCoordsSlot = glGetAttribLocation(self.program, "TextureCoords");
-    
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, self.paintTexture.textureID);
-    glUniform1i(textureSlot, 1);
     
     glBindBuffer(GL_ARRAY_BUFFER, self.vertexBuffer);
     GLsizeiptr bufferSizeBytes = sizeof(Vertex) * 4;
