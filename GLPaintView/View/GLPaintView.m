@@ -84,6 +84,10 @@ static NSInteger const kDefaultBrushSize = 40;
     [self display];
 }
 
+- (void)setBrushImageWithImageName:(NSString *)imageName {
+    [self.paintTexture setBrushTextureWithImageName:imageName];
+}
+
 #pragma mark - Touches
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
@@ -138,6 +142,8 @@ static NSInteger const kDefaultBrushSize = 40;
 
 - (void)setBrushSize:(CGFloat)brushSize {
     _brushSize = brushSize;
+    
+    [self.paintTexture setBrushSize:brushSize];
 }
 
 - (void)setBrushColor:(UIColor *)brushColor {
@@ -153,10 +159,6 @@ static NSInteger const kDefaultBrushSize = 40;
 #pragma mark - Private
 
 - (void)commonInit {
-    self.brushSize = kDefaultBrushSize;
-    self.brushColor = [UIColor blackColor];
-    self.brushMode = MFPaintViewBrushModePaint;
-    
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     [EAGLContext setCurrentContext:self.context];
     
@@ -175,6 +177,10 @@ static NSInteger const kDefaultBrushSize = 40;
     self.paintTexture = [[GLPaintTexture alloc] initWithContext:self.context
                                                            size:CGSizeMake(self.drawableWidth, self.drawableHeight)];
     [self bindTexture];
+    
+    self.brushSize = kDefaultBrushSize;
+    self.brushColor = [UIColor blackColor];
+    self.brushMode = MFPaintViewBrushModePaint;
 }
 
 // 创建 program

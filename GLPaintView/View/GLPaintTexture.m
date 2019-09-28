@@ -105,11 +105,32 @@ typedef struct {
     glUniform1f(bSlot, mfColor.b);
 }
 
+- (void)setBrushSize:(CGFloat)brushSize {
+    glUseProgram(self.program);
+    GLuint sizeSlot = glGetUniformLocation(self.program, "Size");
+    
+    glUniform1f(sizeSlot, brushSize);
+}
+
 - (void)clear {
     glBindFramebuffer(GL_FRAMEBUFFER, self.frameBuffer);
     
     glClearColor (1.0, 1.0, 1.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
+}
+
+- (void)setBrushTextureWithImageName:(NSString *)imageName {
+    // 加载纹理
+    NSString *imagePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:imageName];
+    UIImage *image = [UIImage imageWithContentsOfFile:imagePath];
+    self.brushTextureID = [MFShaderHelper createTextureWithImage:image];
+    
+    glUseProgram(self.program);
+    GLuint textureSlot = glGetUniformLocation(self.program, "Texture");
+    
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, self.brushTextureID);
+    glUniform1i(textureSlot, 0);
 }
 
 #pragma mark - Private
@@ -125,7 +146,7 @@ typedef struct {
     [self genTargetTexture];
     
     // 初始化笔触纹理
-    [self setBrushTextureWithImageName:@"brush.png"];
+    [self setBrushTextureWithImageName:@"brush1.png"];
     
     // 指定窗口大小
     glViewport(0, 0, self.drawableWidth, self.drawableHeight);
@@ -164,21 +185,6 @@ typedef struct {
     
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _textureID, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
-}
-
-// 通过笔触的图片，来设置当前使用的笔触纹理
-- (void)setBrushTextureWithImageName:(NSString *)imageName {
-    // 加载纹理
-    NSString *imagePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:imageName];
-    UIImage *image = [UIImage imageWithContentsOfFile:imagePath];
-    self.brushTextureID = [MFShaderHelper createTextureWithImage:image];
-    
-    glUseProgram(self.program);
-    GLuint textureSlot = glGetUniformLocation(self.program, "Texture");
-    
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, self.brushTextureID);
-    glUniform1i(textureSlot, 0);
 }
 
 // 获取渲染缓存宽度
@@ -221,6 +227,15 @@ typedef struct {
     glVertexAttribPointer(positionSlot, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL + offsetof(Vertex, positionCoord));
     
     glDrawArrays(GL_POINTS, 0, self.vertexCount);
+}
+
+#pragma mark - Custom Accessor
+
+- (void)setBrushTextureID:(GLuint)brushTextureID {
+    if (_brushTextureID > 0) {
+        glDeleteTextures(1, &_brushTextureID);
+    }
+    _brushTextureID = brushTextureID;
 }
 
 @end

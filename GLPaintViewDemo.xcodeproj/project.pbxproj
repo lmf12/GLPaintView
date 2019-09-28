@@ -11,7 +11,9 @@
 		E80B838E2336297600BA9CE7 /* GLPaintView.m in Sources */ = {isa = PBXBuildFile; fileRef = E80B838D2336297600BA9CE7 /* GLPaintView.m */; };
 		E80B8392233756EB00BA9CE7 /* brush.fsh in Resources */ = {isa = PBXBuildFile; fileRef = E80B8390233756EB00BA9CE7 /* brush.fsh */; };
 		E80B8393233756EB00BA9CE7 /* brush.vsh in Resources */ = {isa = PBXBuildFile; fileRef = E80B8391233756EB00BA9CE7 /* brush.vsh */; };
-		E80B839A2337841C00BA9CE7 /* brush.png in Resources */ = {isa = PBXBuildFile; fileRef = E80B83992337841C00BA9CE7 /* brush.png */; };
+		E8597790233FAE5900270EAD /* brush3.png in Resources */ = {isa = PBXBuildFile; fileRef = E859778D233FAE5800270EAD /* brush3.png */; };
+		E8597791233FAE5900270EAD /* brush1.png in Resources */ = {isa = PBXBuildFile; fileRef = E859778E233FAE5900270EAD /* brush1.png */; };
+		E8597792233FAE5900270EAD /* brush2.png in Resources */ = {isa = PBXBuildFile; fileRef = E859778F233FAE5900270EAD /* brush2.png */; };
 		E86CCED1233B53F5007DF53E /* MFBezierCurvesTool.m in Sources */ = {isa = PBXBuildFile; fileRef = E86CCED0233B53F5007DF53E /* MFBezierCurvesTool.m */; };
 		E86CCEDE233E6AD0007DF53E /* GLPaintTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = E86CCEDD233E6AD0007DF53E /* GLPaintTexture.m */; };
 		E86CCEE1233E7A45007DF53E /* normal.fsh in Resources */ = {isa = PBXBuildFile; fileRef = E86CCEDF233E7A45007DF53E /* normal.fsh */; };
@@ -32,7 +34,9 @@
 		E80B838D2336297600BA9CE7 /* GLPaintView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GLPaintView.m; sourceTree = "<group>"; };
 		E80B8390233756EB00BA9CE7 /* brush.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = brush.fsh; sourceTree = "<group>"; };
 		E80B8391233756EB00BA9CE7 /* brush.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = brush.vsh; sourceTree = "<group>"; };
-		E80B83992337841C00BA9CE7 /* brush.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush.png; sourceTree = "<group>"; };
+		E859778D233FAE5800270EAD /* brush3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush3.png; sourceTree = "<group>"; };
+		E859778E233FAE5900270EAD /* brush1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush1.png; sourceTree = "<group>"; };
+		E859778F233FAE5900270EAD /* brush2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush2.png; sourceTree = "<group>"; };
 		E86CCECF233B53F5007DF53E /* MFBezierCurvesTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MFBezierCurvesTool.h; sourceTree = "<group>"; };
 		E86CCED0233B53F5007DF53E /* MFBezierCurvesTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MFBezierCurvesTool.m; sourceTree = "<group>"; };
 		E86CCEDC233E6AD0007DF53E /* GLPaintTexture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GLPaintTexture.h; sourceTree = "<group>"; };
@@ -112,7 +116,9 @@
 		E80B83982337841C00BA9CE7 /* Image */ = {
 			isa = PBXGroup;
 			children = (
-				E80B83992337841C00BA9CE7 /* brush.png */,
+				E859778E233FAE5900270EAD /* brush1.png */,
+				E859778F233FAE5900270EAD /* brush2.png */,
+				E859778D233FAE5800270EAD /* brush3.png */,
 			);
 			path = Image;
 			sourceTree = "<group>";
@@ -221,7 +227,9 @@
 				E80B8393233756EB00BA9CE7 /* brush.vsh in Resources */,
 				E86CCEE2233E7A45007DF53E /* normal.vsh in Resources */,
 				E80B8392233756EB00BA9CE7 /* brush.fsh in Resources */,
-				E80B839A2337841C00BA9CE7 /* brush.png in Resources */,
+				E8597790233FAE5900270EAD /* brush3.png in Resources */,
+				E8597792233FAE5900270EAD /* brush2.png in Resources */,
+				E8597791233FAE5900270EAD /* brush1.png in Resources */,
 				E8EAA81D23361C3800E1B0E8 /* LaunchScreen.storyboard in Resources */,
 				E8EAA81A23361C3800E1B0E8 /* Assets.xcassets in Resources */,
 				E8EAA81823361C3800E1B0E8 /* Main.storyboard in Resources */,

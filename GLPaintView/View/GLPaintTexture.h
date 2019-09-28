@@ -29,7 +29,13 @@
 /// 设置颜色
 - (void)setColor:(UIColor *)color;
 
+/// 设置尺寸
+- (void)setBrushSize:(CGFloat)brushSize;
+
 /// 清除画布
 - (void)clear;
+
+// 通过笔触的图片，来设置当前使用的笔触纹理
+- (void)setBrushTextureWithImageName:(NSString *)imageName;
 
 @end

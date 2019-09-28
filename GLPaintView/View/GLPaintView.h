@@ -28,6 +28,9 @@ typedef NS_ENUM(NSUInteger, GLPaintViewBrushMode) {
 /// 笔刷模式，默认画笔
 @property (nonatomic, assign) GLPaintViewBrushMode brushMode;
 
+///通过图片文件名来创建笔触形状
+- (void)setBrushImageWithImageName:(NSString *)imageName;
+
 /// 清空画布
 - (void)clear;
 
