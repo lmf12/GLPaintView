@@ -123,7 +123,7 @@ float distance(CGPoint fromPoint, CGPoint toPoint) {
                   A:(float)A
                   B:(float)B
                   C:(float)C {
-    return sqrtf(A * pow(t, 2.0) + B * t + C);
+    return sqrtf(MAX(A * pow(t, 2.0) + B * t + C, 0));
 }
 
 /**
