@@ -6,15 +6,15 @@
 //  Copyright © 2019年 Lyman Li. All rights reserved.
 //
 
-#import <OpenGLES/ES2/gl.h>
-
-#import "MFShaderHelper.h"
+#import "GLPaintTexture.h"
 #import "MFBezierCurvesTool.h"
+#import "MFShaderHelper.h"
 
 #import "GLPaintView.h"
 
 typedef struct {
     float positionCoord[3];
+    float textureCoord[2];
 } Vertex;
 
 CGPoint middlePoint(CGPoint point1, CGPoint point2) {
@@ -23,9 +23,7 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
 
 @interface GLPaintView ()
 
-@property (nonatomic, assign) Vertex *vertices; // 顶点数组
-@property (nonatomic, assign) int currentVertexSize; // 记录顶点数组的容量，当容量不足的时候才扩容，避免频繁申请内存空间
-@property (nonatomic, assign) int vertexCount;  //  顶点数
+@property (nonatomic, strong) GLPaintTexture *paintTexture;
 
 @property (nonatomic, strong) EAGLContext *context;
 
@@ -34,7 +32,8 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
 @property (nonatomic, assign) GLuint vertexBuffer; // 顶点缓存
 
 @property (nonatomic, assign) GLuint program; // 着色器程序
-@property (nonatomic, assign) GLuint brushTextureID; // 笔触纹理
+
+@property (nonatomic, assign) Vertex *vertices;
 
 @property (nonatomic, strong) CAEAGLLayer *glLayer;
 
@@ -56,9 +55,6 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
     if (_program) {
         glUseProgram(0);
         glDeleteProgram(_program);
-    }
-    if (_brushTextureID > 0) {
-        glDeleteTextures(1, &_brushTextureID);
     }
     [self deleteBuffers];
 }
@@ -85,8 +81,8 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
     [super touchesBegan:touches withEvent:event];
     
     CGPoint point = [[touches anyObject] locationInView:self];
-    [self genVerticesWithPoints:@[@(point)]];
-    [self renderPoints];
+    NSArray *points = [self verticesWithPoints:@[@(point)]];
+    [self drawPointsToScreen:points];
     self.fromPoint = point;
 }
 
@@ -124,8 +120,7 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
     
     NSArray <NSValue *>*points = [MFBezierCurvesTool pointsWithFrom:from to:to control:control];
     
-    [self genVerticesWithPoints:points];
-    [self renderPoints];
+    [self drawPointsToScreen:[self verticesWithPoints:points]];
     
     self.fromPoint = to;
 }
@@ -133,32 +128,35 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
 #pragma mark - Private
 
 - (void)commonInit {
-    [self setupGLLayer];
-    
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     [EAGLContext setCurrentContext:self.context];
     
-    // 创建着色器程序
+    self.vertices = malloc(sizeof(Vertex) * 4);
+    self.vertices[0] = (Vertex){{-1, 1, 0}, {0, 1}};
+    self.vertices[1] = (Vertex){{-1, -1, 0}, {0, 0}};
+    self.vertices[2] = (Vertex){{1, 1, 0}, {1, 1}};
+    self.vertices[3] = (Vertex){{1, -1, 0}, {1, 0}};
+    
+    [self setupGLLayer];
     [self genProgram];
-    
-    // 创建缓存
     [self genBuffers];
-    
-    // 绑定纹理输出的层
     [self bindRenderLayer:self.glLayer];
-    
-    // 初始化笔触纹理
-    [self setBrushTextureWithImageName:@"brush.png"];
-    
-    // 指定窗口大小
     glViewport(0, 0, self.drawableWidth, self.drawableHeight);
     
-    // 设置混合模式，才能正确渲染带有透明部分的纹理
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    
-    // 清除画布
-    [self clear];
+    self.paintTexture = [[GLPaintTexture alloc] initWithContext:self.context
+                                                           size:CGSizeMake(self.drawableWidth, self.drawableHeight)];
+}
+
+// 创建 program
+- (void)genProgram {
+    self.program = [MFShaderHelper programWithShaderName:@"normal"];
+}
+
+// 创建 buffer
+- (void)genBuffers {
+    glGenFramebuffers(1, &_frameBuffer);
+    glGenRenderbuffers(1, &_renderBuffer);
+    glGenBuffers(1, &_vertexBuffer);
 }
 
 // 创建输出层
@@ -169,19 +167,6 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
     self.glLayer = layer;
     
     [self.layer addSublayer:self.glLayer];
-}
-
-// 创建 program
-- (void)genProgram {
-    self.program = [MFShaderHelper programWithShaderName:@"brush"];
-    glUseProgram(self.program);
-}
-
-// 创建 buffer
-- (void)genBuffers {
-    glGenFramebuffers(1, &_frameBuffer);
-    glGenRenderbuffers(1, &_renderBuffer);
-    glGenBuffers(1, &_vertexBuffer);
 }
 
 // 绑定图像要输出的 layer
@@ -196,43 +181,39 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
                               self.renderBuffer);
 }
 
-// 通过笔触的图片，来设置当前使用的笔触纹理
-- (void)setBrushTextureWithImageName:(NSString *)imageName {
-    // 加载纹理
-    NSString *imagePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"brush.png"];
-    UIImage *image = [UIImage imageWithContentsOfFile:imagePath];
-    self.brushTextureID = [MFShaderHelper createTextureWithImage:image];
+// 绘制数据到屏幕
+- (void)drawPointsToScreen:(NSArray<NSValue *> *)points {
+    [self.paintTexture drawPoints:points];
+    [self display];
+}
+
+// 绘制
+- (void)display {
+    glBindFramebuffer(GL_FRAMEBUFFER, self.frameBuffer);
     
-    // 将纹理设置到着色器中
+    glUseProgram(self.program);
+    
     GLuint textureSlot = glGetUniformLocation(self.program, "Texture");
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, self.brushTextureID);
-    glUniform1i(textureSlot, 0);
-}
-
-// 生成本次需要绘制的顶点
-- (void)genVerticesWithPoints:(NSArray <NSValue *>*)points {
-    self.vertexCount = (int)[points count];
+    GLuint positionSlot = glGetAttribLocation(self.program, "Position");
+    GLuint textureCoordsSlot = glGetAttribLocation(self.program, "TextureCoords");
     
-    // 容量不足，扩容
-    if (self.vertexCount > self.currentVertexSize) {
-        if (self.vertices) {
-            free(self.vertices);
-        }
-        self.vertices = malloc(sizeof(Vertex) * self.vertexCount);
-        self.currentVertexSize = self.vertexCount;
-    }
-    // 遍历赋值
-    for (int i = 0; i < self.vertexCount; ++i) {
-        self.vertices[i] = [self vertexWithPoint:points[i].CGPointValue];
-    }
-}
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, self.paintTexture.textureID);
+    glUniform1i(textureSlot, 1);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, self.vertexBuffer);
+    GLsizeiptr bufferSizeBytes = sizeof(Vertex) * 4;
+    glBufferData(GL_ARRAY_BUFFER, bufferSizeBytes, self.vertices, GL_STATIC_DRAW);
+    
+    glEnableVertexAttribArray(positionSlot);
+    glVertexAttribPointer(positionSlot, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL + offsetof(Vertex, positionCoord));
+    
+    glEnableVertexAttribArray(textureCoordsSlot);
+    glVertexAttribPointer(textureCoordsSlot, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL + offsetof(Vertex, textureCoord));
+    
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-// 通过 UIKit 的点坐标，转化成 OpenGL 的顶点
-- (Vertex)vertexWithPoint:(CGPoint)point {
-    float x = (point.x / self.frame.size.width) * 2 - 1;
-    float y = 1 - (point.y / self.frame.size.height) * 2;
-    return (Vertex){{x, y, 0}};
+    [self.context presentRenderbuffer:GL_RENDERBUFFER];
 }
 
 // 获取渲染缓存宽度
@@ -251,6 +232,22 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
     return backingHeight;
 }
 
+// UIKit 坐标点，转化为顶点坐标
+- (NSArray <NSValue *>*)verticesWithPoints:(NSArray <NSValue *>*)points {
+    NSMutableArray *mutArr = [[NSMutableArray alloc] init];
+    for (int i = 0; i < points.count; ++i) {
+        [mutArr addObject:@([self vertexWithPoint:points[i].CGPointValue])];
+    }
+    return [mutArr copy];
+}
+
+// 归一化顶点坐标
+- (CGPoint)vertexWithPoint:(CGPoint)point {
+    float x = (point.x / self.frame.size.width) * 2 - 1;
+    float y = 1 - (point.y / self.frame.size.height) * 2;
+    return CGPointMake(x, y);
+}
+
 // 清除 buffer
 - (void)deleteBuffers {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -264,28 +261,6 @@ CGPoint middlePoint(CGPoint point1, CGPoint point2) {
     if (_vertexBuffer != 0) {
         glDeleteBuffers(1, &_vertexBuffer);
     }
-}
-
-// 渲染 vertices 中保存的顶点
-- (void)renderPoints {
-    GLuint positionSlot = glGetAttribLocation(self.program, "Position");
-    
-    glBindBuffer(GL_ARRAY_BUFFER, self.vertexBuffer);
-    GLsizeiptr bufferSizeBytes = sizeof(Vertex) * self.vertexCount;
-    glBufferData(GL_ARRAY_BUFFER, bufferSizeBytes, self.vertices, GL_DYNAMIC_DRAW);
-    
-    glEnableVertexAttribArray(positionSlot);
-    glVertexAttribPointer(positionSlot, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL + offsetof(Vertex, positionCoord));
-    
-    glDrawArrays(GL_POINTS, 0, self.vertexCount);
-    
-    [self.context presentRenderbuffer:GL_RENDERBUFFER];
-}
-
-// 清除画布
-- (void)clear {
-    glClearColor (1.0, 1.0, 1.0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 @end

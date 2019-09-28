@@ -13,6 +13,9 @@
 		E80B8393233756EB00BA9CE7 /* brush.vsh in Resources */ = {isa = PBXBuildFile; fileRef = E80B8391233756EB00BA9CE7 /* brush.vsh */; };
 		E80B839A2337841C00BA9CE7 /* brush.png in Resources */ = {isa = PBXBuildFile; fileRef = E80B83992337841C00BA9CE7 /* brush.png */; };
 		E86CCED1233B53F5007DF53E /* MFBezierCurvesTool.m in Sources */ = {isa = PBXBuildFile; fileRef = E86CCED0233B53F5007DF53E /* MFBezierCurvesTool.m */; };
+		E86CCEDE233E6AD0007DF53E /* GLPaintTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = E86CCEDD233E6AD0007DF53E /* GLPaintTexture.m */; };
+		E86CCEE1233E7A45007DF53E /* normal.fsh in Resources */ = {isa = PBXBuildFile; fileRef = E86CCEDF233E7A45007DF53E /* normal.fsh */; };
+		E86CCEE2233E7A45007DF53E /* normal.vsh in Resources */ = {isa = PBXBuildFile; fileRef = E86CCEE0233E7A45007DF53E /* normal.vsh */; };
 		E8EAA81223361C3800E1B0E8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E8EAA81123361C3800E1B0E8 /* AppDelegate.m */; };
 		E8EAA81523361C3800E1B0E8 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E8EAA81423361C3800E1B0E8 /* ViewController.m */; };
 		E8EAA81823361C3800E1B0E8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E8EAA81623361C3800E1B0E8 /* Main.storyboard */; };
@@ -31,6 +34,10 @@
 		E80B83992337841C00BA9CE7 /* brush.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush.png; sourceTree = "<group>"; };
 		E86CCECF233B53F5007DF53E /* MFBezierCurvesTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MFBezierCurvesTool.h; sourceTree = "<group>"; };
 		E86CCED0233B53F5007DF53E /* MFBezierCurvesTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MFBezierCurvesTool.m; sourceTree = "<group>"; };
+		E86CCEDC233E6AD0007DF53E /* GLPaintTexture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GLPaintTexture.h; sourceTree = "<group>"; };
+		E86CCEDD233E6AD0007DF53E /* GLPaintTexture.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GLPaintTexture.m; sourceTree = "<group>"; };
+		E86CCEDF233E7A45007DF53E /* normal.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = normal.fsh; sourceTree = "<group>"; };
+		E86CCEE0233E7A45007DF53E /* normal.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = normal.vsh; sourceTree = "<group>"; };
 		E8EAA80D23361C3800E1B0E8 /* GLPaintViewDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GLPaintViewDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8EAA81023361C3800E1B0E8 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E8EAA81123361C3800E1B0E8 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -70,6 +77,8 @@
 			children = (
 				E80B838C2336297600BA9CE7 /* GLPaintView.h */,
 				E80B838D2336297600BA9CE7 /* GLPaintView.m */,
+				E86CCEDC233E6AD0007DF53E /* GLPaintTexture.h */,
+				E86CCEDD233E6AD0007DF53E /* GLPaintTexture.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -88,6 +97,8 @@
 		E80B838F233756EB00BA9CE7 /* Shader */ = {
 			isa = PBXGroup;
 			children = (
+				E86CCEDF233E7A45007DF53E /* normal.fsh */,
+				E86CCEE0233E7A45007DF53E /* normal.vsh */,
 				E80B8391233756EB00BA9CE7 /* brush.vsh */,
 				E80B8390233756EB00BA9CE7 /* brush.fsh */,
 			);
@@ -193,7 +204,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E86CCEE1233E7A45007DF53E /* normal.fsh in Resources */,
 				E80B8393233756EB00BA9CE7 /* brush.vsh in Resources */,
+				E86CCEE2233E7A45007DF53E /* normal.vsh in Resources */,
 				E80B8392233756EB00BA9CE7 /* brush.fsh in Resources */,
 				E80B839A2337841C00BA9CE7 /* brush.png in Resources */,
 				E8EAA81D23361C3800E1B0E8 /* LaunchScreen.storyboard in Resources */,
@@ -214,6 +227,7 @@
 				E80B838B2336291900BA9CE7 /* MFShaderHelper.m in Sources */,
 				E8EAA82023361C3800E1B0E8 /* main.m in Sources */,
 				E8EAA81223361C3800E1B0E8 /* AppDelegate.m in Sources */,
+				E86CCEDE233E6AD0007DF53E /* GLPaintTexture.m in Sources */,
 				E86CCED1233B53F5007DF53E /* MFBezierCurvesTool.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
