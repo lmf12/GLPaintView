@@ -121,16 +121,17 @@ typedef struct {
 
 - (void)setBrushTextureWithImageName:(NSString *)imageName {
     // 加载纹理
-    NSString *imagePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:imageName];
-    UIImage *image = [UIImage imageWithContentsOfFile:imagePath];
+    UIImage *image = [UIImage imageNamed:imageName];
     self.brushTextureID = [MFShaderHelper createTextureWithImage:image];
     
-    glUseProgram(self.program);
-    GLuint textureSlot = glGetUniformLocation(self.program, "Texture");
-    
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, self.brushTextureID);
-    glUniform1i(textureSlot, 0);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        glUseProgram(self.program);
+        GLuint textureSlot = glGetUniformLocation(self.program, "Texture");
+        
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, self.brushTextureID);
+        glUniform1i(textureSlot, 0);
+    });
 }
 
 #pragma mark - Private
