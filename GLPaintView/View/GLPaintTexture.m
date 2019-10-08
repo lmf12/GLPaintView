@@ -99,10 +99,12 @@ typedef struct {
     GLuint rSlot = glGetUniformLocation(self.program, "R");
     GLuint gSlot = glGetUniformLocation(self.program, "G");
     GLuint bSlot = glGetUniformLocation(self.program, "B");
+    GLuint aSlot = glGetUniformLocation(self.program, "A");
     
     glUniform1f(rSlot, mfColor.r);
     glUniform1f(gSlot, mfColor.g);
     glUniform1f(bSlot, mfColor.b);
+    glUniform1f(aSlot, mfColor.a);
 }
 
 - (void)setBrushSize:(CGFloat)brushSize {
