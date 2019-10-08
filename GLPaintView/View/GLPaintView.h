@@ -21,7 +21,7 @@ typedef NS_ENUM(NSUInteger, GLPaintViewBrushMode) {
 
 @interface GLPaintView : UIView
 
-/// 笔刷尺寸，默认 40
+/// 笔刷尺寸，默认 40，建议设置小于等于 100 
 @property (nonatomic, assign) CGFloat brushSize;
 /// 笔刷颜色，默认黑色
 @property (nonatomic, strong) UIColor *brushColor;

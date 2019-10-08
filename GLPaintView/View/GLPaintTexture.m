@@ -111,7 +111,8 @@ typedef struct {
     glUseProgram(self.program);
     GLuint sizeSlot = glGetUniformLocation(self.program, "Size");
     
-    glUniform1f(sizeSlot, brushSize);
+    GLfloat size = brushSize / 100.0 * [self drawableWidth] / 4.0; // 按照 100 占宽度四分之一来等比缩放
+    glUniform1f(sizeSlot, size);
 }
 
 - (void)clear {
