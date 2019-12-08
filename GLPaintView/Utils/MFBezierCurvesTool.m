@@ -8,10 +8,8 @@
 
 #import "MFBezierCurvesTool.h"
 
-static CGFloat const pointsPerLength = 0.5;  //   系数： 点数 ／ 单位长度
-
 float distance(CGPoint fromPoint, CGPoint toPoint) {
-    return sqrtf(powf(fromPoint.x - toPoint.x, 2.0) + pow(fromPoint.y - fromPoint.x, 2.0));
+    return sqrtf(powf(fromPoint.x - toPoint.x, 2.0) + pow(fromPoint.y - toPoint.y, 2.0));
 }
 
 @implementation MFBezierCurvesTool
@@ -20,12 +18,14 @@ float distance(CGPoint fromPoint, CGPoint toPoint) {
 
 + (NSArray<NSValue *> *)pointsWithFrom:(CGPoint)from
                                     to:(CGPoint)to
-                               control:(CGPoint)control {
+                               control:(CGPoint)control
+                             pointSize:(CGFloat)pointSize {
 
     CGPoint P0 = from;
     CGPoint P1 = control;
     CGPoint P2 = to;
 
+    float pointsPerLength = 5.0 / pointSize;  // 用点的尺寸计算出，单位长度需要多少个点
     int count = MAX(1, ceilf(pointsPerLength * MAX(distance(from, to), distance(from, control))));
     
     int ax = P0.x - 2 * P1.x + P2.x;

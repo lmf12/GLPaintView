@@ -131,9 +131,19 @@ static NSInteger const kDefaultBrushSize = 40;
     CGPoint to = middlePoint(previousPoint, currentPoint);
     CGPoint control = previousPoint;
     
-    NSArray <NSValue *>*points = [MFBezierCurvesTool pointsWithFrom:from to:to control:control];
+    NSArray <NSValue *>*points = [MFBezierCurvesTool pointsWithFrom:from
+                                                                 to:to
+                                                            control:control
+                                                          pointSize:self.brushSize];
+    if (points.count == 0) {
+        return;
+    }
     
-    [self drawPointsToScreen:[self verticesWithPoints:points]];
+    // 去除第一个点，避免与上次绘制的最后一个点重复
+    NSMutableArray *mutPoints = [points mutableCopy];
+    [mutPoints removeObjectAtIndex:0];
+    
+    [self drawPointsToScreen:[self verticesWithPoints:[mutPoints copy]]];
     
     self.fromPoint = to;
 }
