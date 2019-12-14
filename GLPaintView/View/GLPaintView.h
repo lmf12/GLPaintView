@@ -27,6 +27,11 @@ typedef NS_ENUM(NSUInteger, GLPaintViewBrushMode) {
 @property (nonatomic, strong) UIColor *brushColor;
 /// 笔刷模式，默认画笔
 @property (nonatomic, assign) GLPaintViewBrushMode brushMode;
+/// 纹理尺寸，即画布的实际大小，影响最终生成图片的分辨率，默认与 View 的渲染尺寸相同
+@property (nonatomic, assign, readonly) CGSize textureSize;
+
+/// 通过 frame 和 textureSize 初始化
+- (instancetype)initWithFrame:(CGRect)frame textureSize:(CGSize)textureSize;
 
 ///通过图片文件名来创建笔触形状
 - (void)setBrushImageWithImageName:(NSString *)imageName;

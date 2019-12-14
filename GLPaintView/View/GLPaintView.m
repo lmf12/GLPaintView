@@ -41,6 +41,8 @@ static NSInteger const kDefaultBrushSize = 40;
 
 @property (nonatomic, assign) CGPoint fromPoint; // 贝塞尔曲线的起始点
 
+@property (nonatomic, assign, readwrite) CGSize textureSize;
+
 @end
 
 @implementation GLPaintView
@@ -59,6 +61,15 @@ static NSInteger const kDefaultBrushSize = 40;
         glDeleteProgram(_program);
     }
     [self deleteBuffers];
+}
+
+- (instancetype)initWithFrame:(CGRect)frame textureSize:(CGSize)textureSize {
+    self = [super initWithFrame:frame];
+    if (self) {
+        self.textureSize = textureSize;
+        [self commonInit];
+    }
+    return self;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -183,8 +194,13 @@ static NSInteger const kDefaultBrushSize = 40;
     [self genBuffers];
     [self bindRenderLayer:self.glLayer];
     
+    // 没有指定纹理尺寸，设置默认值
+    if (CGSizeEqualToSize(self.textureSize, CGSizeZero)) {
+        self.textureSize = CGSizeMake(self.drawableWidth, self.drawableHeight);
+    }
+    
     self.paintTexture = [[GLPaintTexture alloc] initWithContext:self.context
-                                                           size:CGSizeMake(self.drawableWidth, self.drawableHeight)];
+                                                           size:self.textureSize];
     [self bindTexture];
     
     self.brushSize = kDefaultBrushSize;
