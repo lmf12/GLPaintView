@@ -151,10 +151,7 @@ typedef struct {
     
     // 初始化笔触纹理
     [self setBrushTextureWithImageName:@"brush1.png"];
-    
-    // 指定窗口大小
-    glViewport(0, 0, self.drawableWidth, self.drawableHeight);
-    
+     
     // 设置混合模式，才能正确渲染带有透明部分的纹理
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -218,6 +215,7 @@ typedef struct {
 
 // 渲染 vertices 中保存的顶点
 - (void)renderPoints {
+    glViewport(0, 0, [self drawableWidth], [self drawableHeight]); // 绘制前先切换 Viewport
     glBindFramebuffer(GL_FRAMEBUFFER, self.frameBuffer);
     
     glUseProgram(self.program);

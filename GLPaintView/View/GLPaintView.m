@@ -182,7 +182,6 @@ static NSInteger const kDefaultBrushSize = 40;
     [self genProgram];
     [self genBuffers];
     [self bindRenderLayer:self.glLayer];
-    glViewport(0, 0, self.drawableWidth, self.drawableHeight);
     
     self.paintTexture = [[GLPaintTexture alloc] initWithContext:self.context
                                                            size:CGSizeMake(self.drawableWidth, self.drawableHeight)];
@@ -245,6 +244,8 @@ static NSInteger const kDefaultBrushSize = 40;
 
 // 绘制
 - (void)display {
+    glViewport(0, 0, [self drawableWidth], [self drawableHeight]); // 绘制前先切换 Viewport
+    
     glBindFramebuffer(GL_FRAMEBUFFER, self.frameBuffer);
     
     glUseProgram(self.program);
@@ -254,7 +255,7 @@ static NSInteger const kDefaultBrushSize = 40;
     
     glBindBuffer(GL_ARRAY_BUFFER, self.vertexBuffer);
     GLsizeiptr bufferSizeBytes = sizeof(Vertex) * 4;
-    glBufferData(GL_ARRAY_BUFFER, bufferSizeBytes, self.vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, bufferSizeBytes, self.vertices, GL_DYNAMIC_DRAW);
     
     glEnableVertexAttribArray(positionSlot);
     glVertexAttribPointer(positionSlot, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL + offsetof(Vertex, positionCoord));
