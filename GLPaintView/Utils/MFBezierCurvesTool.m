@@ -12,6 +12,13 @@ float distance(CGPoint fromPoint, CGPoint toPoint) {
     return sqrtf(powf(fromPoint.x - toPoint.x, 2.0) + pow(fromPoint.y - toPoint.y, 2.0));
 }
 
+bool isCenter(CGPoint centerPoint, CGPoint fromPoint, CGPoint toPoint) {
+    bool isCenterX = fabs((fromPoint.x + toPoint.x) / 2 - centerPoint.x) < 0.0001;
+    bool isCenterY = fabs((fromPoint.y + toPoint.y) / 2 - centerPoint.y) < 0.0001;
+    
+    return isCenterX && isCenterY;
+}
+
 @implementation MFBezierCurvesTool
 
 #pragma mark - Public
@@ -22,22 +29,22 @@ float distance(CGPoint fromPoint, CGPoint toPoint) {
                              pointSize:(CGFloat)pointSize {
 
     CGPoint P0 = from;
-    CGPoint P1 = control;
+    // 如果 control 是 from 和 to 的中点，则将 control 设置为和 from 重合
+    CGPoint P1 = isCenter(control, from, to) ? from : control;
     CGPoint P2 = to;
 
-    float pointsPerLength = 5.0 / pointSize;  // 用点的尺寸计算出，单位长度需要多少个点
-    int count = MAX(1, ceilf(pointsPerLength * MAX(distance(from, to), distance(from, control))));
-    
-    int ax = P0.x - 2 * P1.x + P2.x;
-    int ay = P0.y - 2  *P1.y + P2.y;
-    int bx = 2 * P1.x - 2 * P0.x;
-    int by = 2 * P1.y - 2 * P0.y;
+    float ax = P0.x - 2 * P1.x + P2.x;
+    float ay = P0.y - 2 * P1.y + P2.y;
+    float bx = 2 * P1.x - 2 * P0.x;
+    float by = 2 * P1.y - 2 * P0.y;
     
     float A = 4 * (ax * ax + ay * ay);
     float B = 4 * (ax * bx + ay * by);
     float C = bx * bx + by * by;
     
-    float totalLength = [self lengthWithT:1 A:A B:B C:C];
+    float totalLength = [self lengthWithT:1 A:A B:B C:C];  // 整条曲线的长度
+    float pointsPerLength = 5.0 / pointSize;  // 用点的尺寸计算出，单位长度需要多少个点
+    int count = MAX(1, ceilf(pointsPerLength * totalLength));  // 曲线应该生成的点数
     
     NSMutableArray *mutArr = [[NSMutableArray alloc] init];
     for(int i = 0; i <= count; ++i) {
@@ -64,10 +71,10 @@ float distance(CGPoint fromPoint, CGPoint toPoint) {
  假如贝塞尔曲线的起始点是 P0，控制点是 P1，终止点是 P2。
  则：
  
- int ax = P0.x - 2 * P1.x + P2.x;
- int ay = P0.y - 2 * P1.y + P2.y;
- int bx = 2 * P1.x - 2 * P0.x;
- int by = 2 * P1.y - 2 * P0.y;
+ float ax = P0.x - 2 * P1.x + P2.x;
+ float ay = P0.y - 2 * P1.y + P2.y;
+ float bx = 2 * P1.x - 2 * P0.x;
+ float by = 2 * P1.y - 2 * P0.y;
  
  float A = 4 * (ax * ax + ay * ay);
  float B = 4 * (ax * bx + ay * by);
