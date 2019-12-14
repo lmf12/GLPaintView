@@ -19,7 +19,21 @@ typedef NS_ENUM(NSUInteger, GLPaintViewBrushMode) {
     MFPaintViewBrushModeEraser,
 };
 
+@class GLPaintView;
+
+@protocol GLPaintViewDelegate <NSObject>
+
+/// 即将开始绘画
+- (void)paintViewWillBeginDraw:(GLPaintView *)paintView;
+/// 结束绘画
+- (void)paintViewDidFinishDraw:(GLPaintView *)paintView;
+
+@end
+
 @interface GLPaintView : UIView
+
+/// 代理
+@property (nonatomic, weak) id<GLPaintViewDelegate> delegate;
 
 /// 笔刷尺寸，默认 40，建议设置小于等于 100 
 @property (nonatomic, assign) CGFloat brushSize;

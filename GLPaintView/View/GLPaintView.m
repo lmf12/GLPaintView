@@ -104,6 +104,10 @@ static NSInteger const kDefaultBrushSize = 40;
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [super touchesBegan:touches withEvent:event];
     
+    if ([self.delegate respondsToSelector:@selector(paintViewWillBeginDraw:)]) {
+        [self.delegate paintViewWillBeginDraw:self];
+    }
+    
     CGPoint point = [[touches anyObject] locationInView:self];
     NSArray *points = [self verticesWithPoints:@[@(point)]];
     [self drawPointsToScreen:points];
@@ -120,12 +124,20 @@ static NSInteger const kDefaultBrushSize = 40;
     [super touchesEnded:touches withEvent:event];
     
     [self addPointWithTouches:touches];
+    
+    if ([self.delegate respondsToSelector:@selector(paintViewDidFinishDraw:)]) {
+        [self.delegate paintViewDidFinishDraw:self];
+    }
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [super touchesCancelled:touches withEvent:event];
     
     [self addPointWithTouches:touches];
+    
+    if ([self.delegate respondsToSelector:@selector(paintViewDidFinishDraw:)]) {
+        [self.delegate paintViewDidFinishDraw:self];
+    }
 }
 
 - (void)addPointWithTouches:(NSSet<UITouch *> *)touches {

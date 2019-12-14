@@ -11,6 +11,9 @@
 		E80B838E2336297600BA9CE7 /* GLPaintView.m in Sources */ = {isa = PBXBuildFile; fileRef = E80B838D2336297600BA9CE7 /* GLPaintView.m */; };
 		E80B8392233756EB00BA9CE7 /* brush.fsh in Resources */ = {isa = PBXBuildFile; fileRef = E80B8390233756EB00BA9CE7 /* brush.fsh */; };
 		E80B8393233756EB00BA9CE7 /* brush.vsh in Resources */ = {isa = PBXBuildFile; fileRef = E80B8391233756EB00BA9CE7 /* brush.vsh */; };
+		E84DBB6923A4E19B00797D0B /* SelectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = E84DBB6823A4E19B00797D0B /* SelectionView.m */; };
+		E84DBB6C23A4E78A00797D0B /* SelectionCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E84DBB6B23A4E78A00797D0B /* SelectionCell.m */; };
+		E84DBB6F23A4EA7300797D0B /* SelectionModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E84DBB6E23A4EA7300797D0B /* SelectionModel.m */; };
 		E8597790233FAE5900270EAD /* brush3.png in Resources */ = {isa = PBXBuildFile; fileRef = E859778D233FAE5800270EAD /* brush3.png */; };
 		E8597791233FAE5900270EAD /* brush1.png in Resources */ = {isa = PBXBuildFile; fileRef = E859778E233FAE5900270EAD /* brush1.png */; };
 		E8597792233FAE5900270EAD /* brush2.png in Resources */ = {isa = PBXBuildFile; fileRef = E859778F233FAE5900270EAD /* brush2.png */; };
@@ -34,6 +37,12 @@
 		E80B838D2336297600BA9CE7 /* GLPaintView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GLPaintView.m; sourceTree = "<group>"; };
 		E80B8390233756EB00BA9CE7 /* brush.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = brush.fsh; sourceTree = "<group>"; };
 		E80B8391233756EB00BA9CE7 /* brush.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = brush.vsh; sourceTree = "<group>"; };
+		E84DBB6723A4E19B00797D0B /* SelectionView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectionView.h; sourceTree = "<group>"; };
+		E84DBB6823A4E19B00797D0B /* SelectionView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectionView.m; sourceTree = "<group>"; };
+		E84DBB6A23A4E78A00797D0B /* SelectionCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectionCell.h; sourceTree = "<group>"; };
+		E84DBB6B23A4E78A00797D0B /* SelectionCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectionCell.m; sourceTree = "<group>"; };
+		E84DBB6D23A4EA7300797D0B /* SelectionModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectionModel.h; sourceTree = "<group>"; };
+		E84DBB6E23A4EA7300797D0B /* SelectionModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectionModel.m; sourceTree = "<group>"; };
 		E859778D233FAE5800270EAD /* brush3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush3.png; sourceTree = "<group>"; };
 		E859778E233FAE5900270EAD /* brush1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush1.png; sourceTree = "<group>"; };
 		E859778F233FAE5900270EAD /* brush2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush2.png; sourceTree = "<group>"; };
@@ -156,6 +165,12 @@
 				E8EAA81123361C3800E1B0E8 /* AppDelegate.m */,
 				E8EAA81323361C3800E1B0E8 /* ViewController.h */,
 				E8EAA81423361C3800E1B0E8 /* ViewController.m */,
+				E84DBB6723A4E19B00797D0B /* SelectionView.h */,
+				E84DBB6823A4E19B00797D0B /* SelectionView.m */,
+				E84DBB6A23A4E78A00797D0B /* SelectionCell.h */,
+				E84DBB6B23A4E78A00797D0B /* SelectionCell.m */,
+				E84DBB6D23A4EA7300797D0B /* SelectionModel.h */,
+				E84DBB6E23A4EA7300797D0B /* SelectionModel.m */,
 				E8EAA81623361C3800E1B0E8 /* Main.storyboard */,
 				E8EAA81923361C3800E1B0E8 /* Assets.xcassets */,
 				E8EAA81B23361C3800E1B0E8 /* LaunchScreen.storyboard */,
@@ -249,7 +264,10 @@
 				E89EB9AB233F5DD100BB87D8 /* UIColor+Extension.m in Sources */,
 				E8EAA82023361C3800E1B0E8 /* main.m in Sources */,
 				E8EAA81223361C3800E1B0E8 /* AppDelegate.m in Sources */,
+				E84DBB6923A4E19B00797D0B /* SelectionView.m in Sources */,
 				E86CCEDE233E6AD0007DF53E /* GLPaintTexture.m in Sources */,
+				E84DBB6F23A4EA7300797D0B /* SelectionModel.m in Sources */,
+				E84DBB6C23A4E78A00797D0B /* SelectionCell.m in Sources */,
 				E86CCED1233B53F5007DF53E /* MFBezierCurvesTool.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
