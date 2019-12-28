@@ -126,7 +126,7 @@ static NSInteger const kDefaultBrushSize = 40;
     [self.undoOperationStack popModel];
     [self.operationStack pushModel:model];
     
-    [self reDraw];
+    [self drawModel:model];
 }
 
 - (BOOL)canUndo {
@@ -440,6 +440,27 @@ static NSInteger const kDefaultBrushSize = 40;
         self.brushMode = model.brushMode;
         [self.paintTexture drawPoints:model.points];
     }
+    [self display];
+    
+    // 绘制完，还原设置
+    self.brushSize = originBrushSize;
+    self.brushColor = originBrushColor;
+    self.brushImageName = originBrushImageName;
+    self.brushMode = originBrushMode;
+}
+
+// 绘制 model 中的数据
+- (void)drawModel:(MFPaintModel *)model {
+    CGFloat originBrushSize = self.brushSize;
+    UIColor *originBrushColor = self.brushColor;
+    NSString *originBrushImageName = self.brushImageName;
+    GLPaintViewBrushMode originBrushMode = self.brushMode;
+    
+    self.brushSize = model.brushSize;
+    self.brushColor = model.brushColor;
+    self.brushImageName = model.brushImageName;
+    self.brushMode = model.brushMode;
+    [self.paintTexture drawPoints:model.points];
     [self display];
     
     // 绘制完，还原设置
