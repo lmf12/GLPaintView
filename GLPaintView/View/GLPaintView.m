@@ -69,10 +69,13 @@ static NSInteger const kDefaultBrushSize = 40;
     [self deleteBuffers];
 }
 
-- (instancetype)initWithFrame:(CGRect)frame textureSize:(CGSize)textureSize {
+- (instancetype)initWithFrame:(CGRect)frame
+                  textureSize:(CGSize)textureSize
+       textureBackgroundColor:(UIColor *)textureBackgroundColor {
     self = [super initWithFrame:frame];
     if (self) {
         self.textureSize = textureSize;
+        self.textureBackgroundColor = textureBackgroundColor;
         [self commonInit];
     }
     return self;
@@ -231,11 +234,13 @@ static NSInteger const kDefaultBrushSize = 40;
 - (void)setBrushColor:(UIColor *)brushColor {
     _brushColor = brushColor;
     
-    [self.paintTexture setColor:brushColor];
+    [self setBrushMode:MFPaintViewBrushModePaint];
 }
 
 - (void)setBrushMode:(GLPaintViewBrushMode)brushMode {
     _brushMode = brushMode;
+    
+    [self.paintTexture setColor:brushMode == MFPaintViewBrushModeEraser ? self.textureBackgroundColor : self.brushColor];
 }
 
 - (void)setBrushImageName:(NSString *)brushImageName {
@@ -271,12 +276,17 @@ static NSInteger const kDefaultBrushSize = 40;
     }
     
     self.paintTexture = [[GLPaintTexture alloc] initWithContext:self.context
-                                                           size:self.textureSize];
+                                                           size:self.textureSize
+                                                backgroundColor:self.textureBackgroundColor];
     [self bindTexture];
     
     self.brushSize = kDefaultBrushSize;
     self.brushColor = [UIColor blackColor];
     self.brushMode = MFPaintViewBrushModePaint;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self clear];
+    });
 }
 
 // 创建 program
@@ -408,6 +418,7 @@ static NSInteger const kDefaultBrushSize = 40;
     model.brushSize = self.brushSize;
     model.brushColor = self.brushColor;
     model.brushImageName = self.brushImageName;
+    model.brushMode = self.brushMode;
     model.points = self.pointsPreDraw;
     [self.operationStack pushModel:model];
     // 产生新的操作时，移除撤销的操作栈

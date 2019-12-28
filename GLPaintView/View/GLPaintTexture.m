@@ -20,6 +20,7 @@ typedef struct {
 
 @property (nonatomic, assign, readwrite) CGSize size;
 @property (nonatomic, assign, readwrite) GLuint textureID;
+@property (nonatomic, strong, readwrite) UIColor *backgroundColor;
 
 
 @property (nonatomic, assign) Vertex *vertices; // 顶点数组
@@ -72,11 +73,14 @@ typedef struct {
     [self deleteBuffers];
 }
 
-- (instancetype)initWithContext:(EAGLContext *)context size:(CGSize)size {
+- (instancetype)initWithContext:(EAGLContext *)context
+                           size:(CGSize)size
+                backgroundColor:(UIColor *)backgroundColor {
     self = [super init];
     if (self) {
         self.context = context;
         self.size = size;
+        self.backgroundColor = backgroundColor;
         [self commonInit];
     }
     return self;
@@ -129,7 +133,9 @@ typedef struct {
 - (void)clear {
     glBindFramebuffer(GL_FRAMEBUFFER, self.frameBuffer);
     
-    glClearColor (1.0, 1.0, 1.0, 1.0);
+    MFColor mfColor = [self.backgroundColor mf_color];
+    
+    glClearColor(mfColor.r, mfColor.g, mfColor.b, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
@@ -197,9 +203,6 @@ typedef struct {
     // 设置混合模式，才能正确渲染带有透明部分的纹理
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    
-    // 清除画布
-    [self clear];
 }
 
 // 创建 program

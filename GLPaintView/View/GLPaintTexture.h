@@ -20,8 +20,13 @@
 /// 纹理ID
 @property (nonatomic, assign, readonly) GLuint textureID;
 
-/// 通过上下文和纹理尺寸来初始化
-- (instancetype)initWithContext:(EAGLContext *)context size:(CGSize)size;
+/// 纹理的背景颜色，透明通道会被忽略
+@property (nonatomic, strong, readonly) UIColor *backgroundColor;
+
+/// 初始化
+- (instancetype)initWithContext:(EAGLContext *)context
+                           size:(CGSize)size
+                backgroundColor:(UIColor *)backgroundColor;
 
 /// 绘制顶点，顶点是归一化的坐标
 - (void)drawPoints:(NSArray <NSValue *>*)points;

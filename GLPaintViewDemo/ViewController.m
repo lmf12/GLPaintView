@@ -55,7 +55,8 @@
     CGFloat width = 1500;
     CGSize textureSize = CGSizeMake(width, width * ratio);
     self.paintView = [[GLPaintView alloc] initWithFrame:self.view.bounds
-                                            textureSize:textureSize];
+                                            textureSize:textureSize
+                                 textureBackgroundColor:[UIColor colorWithWhite:0.9 alpha:1]];
     self.paintView.delegate = self;
     [self.view addSubview:self.paintView];
 }
@@ -213,6 +214,9 @@
     self.redoButton.enabled = [self.paintView canRedo];
     self.clearButton.enabled = [self.paintView canUndo];
     self.saveButton.enabled = [self.paintView canUndo];
+    
+    NSString *title = self.paintView.brushMode == MFPaintViewBrushModePaint ? @"橡皮擦" : @"画笔";
+    [self.brushButton setTitle:title forState:UIControlStateNormal];
 }
 
 - (void)saveImage:(UIImage *)image withCompletion:(void (^)(BOOL success))completion {
@@ -254,6 +258,12 @@
 }
 
 - (void)brushAction:(id)sender {
+    if (self.paintView.brushMode == MFPaintViewBrushModePaint) {
+        self.paintView.brushMode = MFPaintViewBrushModeEraser;
+    } else {
+        self.paintView.brushMode = MFPaintViewBrushModePaint;
+    }
+    [self refreshUI];
 }
 
 - (void)undoAction:(id)sender {
@@ -298,6 +308,7 @@
 - (void)selectionView:(SelectionView *)selectionView didSelectModel:(SelectionModel *)model {
     if (selectionView == self.colorSelectionView) {
         [self.paintView setBrushColor:model.color];
+        [self refreshUI];
     } else if (selectionView == self.sizeSelectionView) {
         [self.paintView setBrushSize:model.title.integerValue];
     } else if (selectionView == self.brushSelectionView) {
