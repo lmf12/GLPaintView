@@ -134,6 +134,11 @@ static NSInteger const kDefaultBrushSize = 40;
     return ![self.undoOperationStack isEmpty];
 }
 
+- (UIImage *)currentImage {
+    UIImage *image = [self.paintTexture snapshot];
+    return image;
+}
+
 #pragma mark - Touches
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {

@@ -65,5 +65,8 @@ typedef NS_ENUM(NSUInteger, GLPaintViewBrushMode) {
 /// 清空画布
 - (void)clear;
 
+/// 当前的图片
+- (UIImage *)currentImage;
+
 @end
 

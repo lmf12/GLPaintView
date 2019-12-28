@@ -43,4 +43,7 @@
 - (void)setBrushTextureWithImageName:(NSString *)imageName
                           isFastMode:(BOOL)isFastMode;
 
+/// 当前的图片
+- (UIImage *)snapshot;
+
 @end

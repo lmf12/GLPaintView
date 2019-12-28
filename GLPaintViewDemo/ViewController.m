@@ -6,6 +6,8 @@
 //  Copyright © 2019年 Lyman Li. All rights reserved.
 //
 
+#import <Photos/Photos.h>
+
 #import "GLPaintView.h"
 #import "SelectionView.h"
 
@@ -210,6 +212,38 @@
     self.undoButton.enabled = [self.paintView canUndo];
     self.redoButton.enabled = [self.paintView canRedo];
     self.clearButton.enabled = [self.paintView canUndo];
+    self.saveButton.enabled = [self.paintView canUndo];
+}
+
+- (void)saveImage:(UIImage *)image withCompletion:(void (^)(BOOL success))completion {
+    void (^saveBlock)(void) = ^ {
+        [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+            [PHAssetChangeRequest creationRequestForAssetFromImage:image];
+        } completionHandler:^(BOOL success, NSError * _Nullable error) {
+            if (completion) {
+                completion(success);
+            }
+        }];
+    };
+    
+    PHAuthorizationStatus authStatus = [PHPhotoLibrary authorizationStatus];
+    if (authStatus == PHAuthorizationStatusNotDetermined) {
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+            if (status == PHAuthorizationStatusAuthorized) {
+                saveBlock();
+            } else {
+                if (completion) {
+                    completion(NO);
+                }
+            }
+        }];
+    } else if (authStatus != PHAuthorizationStatusAuthorized) {
+        if (completion) {
+            completion(NO);
+        }
+    } else {
+        saveBlock();
+    }
 }
 
 #pragma mark - Action
@@ -233,6 +267,14 @@
 }
 
 - (void)saveAction:(id)sender {
+    UIImage *image = [self.paintView currentImage];
+    [self saveImage:image withCompletion:^(BOOL success) {
+        if (success) {
+            NSLog(@"保存成功！");
+        } else {
+            NSLog(@"保存失败！");
+        }
+    }];
 }
 
 #pragma mark - GLPaintViewDelegate
