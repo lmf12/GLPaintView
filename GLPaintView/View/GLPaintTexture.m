@@ -35,6 +35,8 @@ typedef struct {
 @property (nonatomic, assign) GLuint program; // 着色器程序
 @property (nonatomic, assign) GLuint brushTextureID; // 笔触纹理
 
+@property (nonatomic, strong) NSMutableDictionary *brushTextureCache;  // 笔触纹理缓存
+
 @end
 
 @implementation GLPaintTexture
@@ -52,9 +54,18 @@ typedef struct {
         glUseProgram(0);
         glDeleteProgram(_program);
     }
-    if (_brushTextureID > 0) {
-        glDeleteTextures(1, &_brushTextureID);
-    }
+    // 删除笔触纹理
+    [self.brushTextureCache enumerateKeysAndObjectsUsingBlock:^(NSString *key,
+                                                                NSMutableArray<NSNumber *> *IDs,
+                                                                BOOL *stop) {
+        for (NSNumber *number in IDs) {
+            GLuint textureID = [number intValue];
+            if (textureID > 0) {
+                glDeleteTextures(1, &textureID);
+            }
+        }
+    }];
+    
     if (_textureID > 0) {
         glDeleteTextures(1, &_textureID);
     }
@@ -122,24 +133,48 @@ typedef struct {
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-- (void)setBrushTextureWithImageName:(NSString *)imageName {
-    // 加载纹理
-    UIImage *image = [UIImage imageNamed:imageName];
-    self.brushTextureID = [MFShaderHelper createTextureWithImage:image];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        glUseProgram(self.program);
-        GLuint textureSlot = glGetUniformLocation(self.program, "Texture");
+- (void)setBrushTextureUseFastModeIfCanWithImageName:(NSString *)imageName {
+    NSMutableArray *textureIDs = [self.brushTextureCache valueForKey:imageName];
+    [self setBrushTextureWithImageName:imageName isFastMode:textureIDs != nil];
+}
+
+- (void)setBrushTextureWithImageName:(NSString *)imageName
+                          isFastMode:(BOOL)isFastMode {
+    if (imageName.length == 0) {
+        return;
+    }
+    if (isFastMode) {
+        NSMutableArray *textureIDs = [self.brushTextureCache valueForKey:imageName];
+        if (!textureIDs) {
+            return;
+        }
+        self.brushTextureID = (GLuint)[[textureIDs firstObject] intValue];
+        [self applyBrushTexture];
+    } else {
+        // 加载纹理
+        UIImage *image = [UIImage imageNamed:imageName];
+        self.brushTextureID = [MFShaderHelper createTextureWithImage:image];
         
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, self.brushTextureID);
-        glUniform1i(textureSlot, 0);
-    });
+        // 添加缓存
+        NSMutableArray *textureIDs = [self.brushTextureCache valueForKey:imageName];
+        if (!textureIDs) {
+            textureIDs = [[NSMutableArray alloc] init];
+        }
+        [textureIDs addObject:@(self.brushTextureID)];
+        [self.brushTextureCache setValue:textureIDs forKey:imageName];
+        
+        // 异步应用
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self applyBrushTexture];
+        });
+    }
 }
 
 #pragma mark - Private
 
 - (void)commonInit {
+    self.brushTextureCache = [[NSMutableDictionary alloc] init];
+    
     // 创建着色器程序
     [self genProgram];
     
@@ -150,7 +185,7 @@ typedef struct {
     [self genTargetTexture];
     
     // 初始化笔触纹理
-    [self setBrushTextureWithImageName:@"brush1.png"];
+    [self setBrushTextureWithImageName:@"brush1.png" isFastMode:NO];
      
     // 设置混合模式，才能正确渲染带有透明部分的纹理
     glEnable(GL_BLEND);
@@ -231,13 +266,14 @@ typedef struct {
     glDrawArrays(GL_POINTS, 0, self.vertexCount);
 }
 
-#pragma mark - Custom Accessor
-
-- (void)setBrushTextureID:(GLuint)brushTextureID {
-    if (_brushTextureID > 0) {
-        glDeleteTextures(1, &_brushTextureID);
-    }
-    _brushTextureID = brushTextureID;
+// 应用笔触纹理
+- (void)applyBrushTexture {
+    glUseProgram(self.program);
+    GLuint textureSlot = glGetUniformLocation(self.program, "Texture");
+    
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, self.brushTextureID);
+    glUniform1i(textureSlot, 0);
 }
 
 @end

@@ -35,7 +35,12 @@
 /// 清除画布
 - (void)clear;
 
-// 通过笔触的图片，来设置当前使用的笔触纹理
-- (void)setBrushTextureWithImageName:(NSString *)imageName;
+/// 如果有缓存，使用快速模式，否则使用普通模式
+- (void)setBrushTextureUseFastModeIfCanWithImageName:(NSString *)imageName;
+
+/// 通过笔触的图片，来设置当前使用的笔触纹理
+/// isFastMode 是否快速模式，会读取缓存的纹理，读取前请确保之前缓存过 
+- (void)setBrushTextureWithImageName:(NSString *)imageName
+                          isFastMode:(BOOL)isFastMode;
 
 @end

@@ -9,6 +9,7 @@
 #import "GLPaintTexture.h"
 #import "MFBezierCurvesTool.h"
 #import "MFShaderHelper.h"
+#import "MFPaintStack.h"
 
 #import "GLPaintView.h"
 
@@ -42,6 +43,11 @@ static NSInteger const kDefaultBrushSize = 40;
 @property (nonatomic, assign) CGPoint fromPoint; // 贝塞尔曲线的起始点
 
 @property (nonatomic, assign, readwrite) CGSize textureSize;
+
+@property (nonatomic, strong) NSMutableArray *pointsPreDraw;  // 手指按住屏幕，到离开，产生的所有的点
+
+@property (nonatomic, strong) MFPaintStack *operationStack;  // 操作的栈
+@property (nonatomic, strong) MFPaintStack *undoOperationStack;  // 撤销的操作的栈
 
 @end
 
@@ -93,10 +99,39 @@ static NSInteger const kDefaultBrushSize = 40;
 - (void)clear {
     [self.paintTexture clear];
     [self display];
+    
+    [self.operationStack clear];
+    [self.undoOperationStack clear];
 }
 
-- (void)setBrushImageWithImageName:(NSString *)imageName {
-    [self.paintTexture setBrushTextureWithImageName:imageName];
+- (void)undo {
+    if ([self.operationStack isEmpty]) {
+        return;
+    }
+    MFPaintModel *model = self.operationStack.topModel;
+    [self.operationStack popModel];
+    [self.undoOperationStack pushModel:model];
+    
+    [self reDraw];
+}
+
+- (void)redo {
+    if ([self.undoOperationStack isEmpty]) {
+        return;
+    }
+    MFPaintModel *model = self.undoOperationStack.topModel;
+    [self.undoOperationStack popModel];
+    [self.operationStack pushModel:model];
+    
+    [self reDraw];
+}
+
+- (BOOL)canUndo {
+    return ![self.operationStack isEmpty];
+}
+
+- (BOOL)canRedo {
+    return ![self.undoOperationStack isEmpty];
 }
 
 #pragma mark - Touches
@@ -110,6 +145,9 @@ static NSInteger const kDefaultBrushSize = 40;
     
     CGPoint point = [[touches anyObject] locationInView:self];
     NSArray *points = [self verticesWithPoints:@[@(point)]];
+    
+    [self.pointsPreDraw removeAllObjects];
+    [self.pointsPreDraw addObjectsFromArray:points];
     [self drawPointsToScreen:points];
     self.fromPoint = point;
 }
@@ -125,6 +163,8 @@ static NSInteger const kDefaultBrushSize = 40;
     
     [self addPointWithTouches:touches];
     
+    [self addOperation];
+    
     if ([self.delegate respondsToSelector:@selector(paintViewDidFinishDraw:)]) {
         [self.delegate paintViewDidFinishDraw:self];
     }
@@ -134,6 +174,8 @@ static NSInteger const kDefaultBrushSize = 40;
     [super touchesCancelled:touches withEvent:event];
     
     [self addPointWithTouches:touches];
+    
+    [self addOperation];
     
     if ([self.delegate respondsToSelector:@selector(paintViewDidFinishDraw:)]) {
         [self.delegate paintViewDidFinishDraw:self];
@@ -165,8 +207,10 @@ static NSInteger const kDefaultBrushSize = 40;
     // 去除第一个点，避免与上次绘制的最后一个点重复
     NSMutableArray *mutPoints = [points mutableCopy];
     [mutPoints removeObjectAtIndex:0];
-    
-    [self drawPointsToScreen:[self verticesWithPoints:[mutPoints copy]]];
+    points = [self verticesWithPoints:[mutPoints copy]];
+
+    [self.pointsPreDraw addObjectsFromArray:points];
+    [self drawPointsToScreen:points];
     
     self.fromPoint = to;
 }
@@ -189,9 +233,19 @@ static NSInteger const kDefaultBrushSize = 40;
     _brushMode = brushMode;
 }
 
+- (void)setBrushImageName:(NSString *)brushImageName {
+    _brushImageName = [brushImageName copy];
+    
+    [self.paintTexture setBrushTextureUseFastModeIfCanWithImageName:brushImageName];
+}
+
 #pragma mark - Private
 
 - (void)commonInit {
+    self.operationStack = [[MFPaintStack alloc] init];
+    self.undoOperationStack = [[MFPaintStack alloc] init];
+    self.pointsPreDraw = [[NSMutableArray alloc] init];
+    
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     [EAGLContext setCurrentContext:self.context];
     
@@ -341,6 +395,42 @@ static NSInteger const kDefaultBrushSize = 40;
     if (_vertexBuffer != 0) {
         glDeleteBuffers(1, &_vertexBuffer);
     }
+}
+
+// 记录操作数据
+- (void)addOperation {
+    MFPaintModel *model = [[MFPaintModel alloc] init];
+    model.brushSize = self.brushSize;
+    model.brushColor = self.brushColor;
+    model.brushImageName = self.brushImageName;
+    model.points = self.pointsPreDraw;
+    [self.operationStack pushModel:model];
+    // 产生新的操作时，移除撤销的操作栈
+    [self.undoOperationStack clear];
+}
+
+// 重新绘制全部 operationStack 中的数据
+- (void)reDraw {
+    CGFloat originBrushSize = self.brushSize;
+    UIColor *originBrushColor = self.brushColor;
+    NSString *originBrushImageName = self.brushImageName;
+    GLPaintViewBrushMode originBrushMode = self.brushMode;
+    
+    [self.paintTexture clear];
+    for (MFPaintModel *model in self.operationStack.modelList) {
+        self.brushSize = model.brushSize;
+        self.brushColor = model.brushColor;
+        self.brushImageName = model.brushImageName;
+        self.brushMode = model.brushMode;
+        [self.paintTexture drawPoints:model.points];
+    }
+    [self display];
+    
+    // 绘制完，还原设置
+    self.brushSize = originBrushSize;
+    self.brushColor = originBrushColor;
+    self.brushImageName = originBrushImageName;
+    self.brushMode = originBrushMode;
 }
 
 @end

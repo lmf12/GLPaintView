@@ -44,6 +44,8 @@
     [self setupButtons];
     [self setupSelectionViews];
     [self setupData];
+    
+    [self refreshUI];
 }
 
 - (void)setupPaintView {
@@ -118,6 +120,9 @@
 
 - (UIButton *)commonButtonWithTitle:(NSString *)title action:(SEL)action {
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0, 10, 50, 40)];
+    [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [button setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
+    [button setTitleColor:[UIColor grayColor] forState:UIControlStateDisabled];
     button.titleLabel.font = [UIFont systemFontOfSize:12];
     button.backgroundColor = [UIColor blackColor];
     button.layer.masksToBounds = YES;
@@ -201,19 +206,30 @@
     button.center = CGPointMake(centerX, button.center.y);
 }
 
+- (void)refreshUI {
+    self.undoButton.enabled = [self.paintView canUndo];
+    self.redoButton.enabled = [self.paintView canRedo];
+    self.clearButton.enabled = [self.paintView canUndo];
+}
+
 #pragma mark - Action
 
 - (void)clearAction:(id)sender {
     [self.paintView clear];
+    [self refreshUI];
 }
 
 - (void)brushAction:(id)sender {
 }
 
 - (void)undoAction:(id)sender {
+    [self.paintView undo];
+    [self refreshUI];
 }
 
 - (void)redoAction:(id)sender {
+    [self.paintView redo];
+    [self refreshUI];
 }
 
 - (void)saveAction:(id)sender {
@@ -231,6 +247,8 @@
     [UIView animateWithDuration:0.25 animations:^{
         self.bottomBar.alpha = 1.0;
     }];
+    
+    [self refreshUI];
 }
 
 #pragma mark - SelectionViewDelegate
@@ -241,7 +259,7 @@
     } else if (selectionView == self.sizeSelectionView) {
         [self.paintView setBrushSize:model.title.integerValue];
     } else if (selectionView == self.brushSelectionView) {
-        [self.paintView setBrushImageWithImageName:model.imageName];
+        [self.paintView setBrushImageName:model.imageName];
     }
 }
 
