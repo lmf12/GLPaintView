@@ -26,8 +26,8 @@ CGSize textureSize = CGSizeMake(width, width * ratio);
 GLPaintView *paintView = [[GLPaintView alloc] initWithFrame:self.view.bounds
                                                 textureSize:textureSize
                                      textureBackgroundColor:[UIColor whiteColor]];
-self.paintView.delegate = self;
-[self.view addSubview:self.paintView];
+paintView.delegate = self;
+[self.view addSubview:paintView];
 ```
 
 # 接口说明
