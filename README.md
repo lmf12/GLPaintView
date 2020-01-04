@@ -45,3 +45,8 @@ paintView.delegate = self;
 * `frame` 很好理解，就是 `view` 的尺寸和位置。
 * `textureSize` 指实际生成的画布的大小，画布尺寸可以比 `view` 的尺寸大得多，会影响最终导出的图片的分辨率。 
 * `textureBackgroundColor` 指画布的背景色，当使用橡皮擦的时候，实际上也只是把画笔切换成了背景色而已。
+
+## 更多介绍
+
+[在 iOS 中使用 OpenGL ES 实现绘画板](http://www.lymanli.com/2020/01/04/ios-opengles-paint/)
+
