@@ -23,9 +23,10 @@
 CGFloat ratio = self.view.frame.size.height / self.view.frame.size.width;
 CGFloat width = 1500;
 CGSize textureSize = CGSizeMake(width, width * ratio);
-GLPaintView *paintView = [[GLPaintView alloc] initWithFrame:self.view.bounds
-                                                textureSize:textureSize
-                                     textureBackgroundColor:[UIColor whiteColor]];
+UIImage *image = [UIImage imageNamed:@"paper.jpg"];
+self.paintView = [[GLPaintView alloc] initWithFrame:self.view.bounds
+                                        textureSize:textureSize
+                                    backgroundImage:image];
 paintView.delegate = self;
 [self.view addSubview:paintView];
 ```
@@ -39,12 +40,14 @@ paintView.delegate = self;
 ```objc
 - (instancetype)initWithFrame:(CGRect)frame
                   textureSize:(CGSize)textureSize
-       textureBackgroundColor:(UIColor *)textureBackgroundColor;
+              backgroundColor:(UIColor *)backgroundColor
+              backgroundImage:(UIImage *)backgroundImage;
 ```
 
 * `frame` 很好理解，就是 `view` 的尺寸和位置。
 * `textureSize` 指实际生成的画布的大小，画布尺寸可以比 `view` 的尺寸大得多，会影响最终导出的图片的分辨率。 
-* `textureBackgroundColor` 指画布的背景色，当使用橡皮擦的时候，实际上也只是把画笔切换成了背景色而已。
+* `backgroundColor` 指画布的背景色，传 `nil` 的时候，会设置成白色。
+* `backgroundImage` 指背景图片，当比例与 `textureSize` 不同时会被拉伸。
 
 ## 更多介绍
 
