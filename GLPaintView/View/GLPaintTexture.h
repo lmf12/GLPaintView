@@ -9,6 +9,11 @@
 #import <UIKit/UIKit.h>
 #import <OpenGLES/ES2/gl.h>
 
+typedef NS_ENUM(NSUInteger, GLPaintTextureBrushMode) {
+    GLPaintTextureBrushModePaint,
+    GLPaintTextureBrushModeEraser,
+};
+
 /**
  处理涂抹的绘制逻辑，最终输出一张纹理
  */
@@ -23,10 +28,14 @@
 /// 纹理的背景颜色，透明通道会被忽略
 @property (nonatomic, strong, readonly) UIColor *backgroundColor;
 
+/// 笔刷模式，默认画笔
+@property (nonatomic, assign) GLPaintTextureBrushMode brushMode;
+
 /// 初始化
 - (instancetype)initWithContext:(EAGLContext *)context
                            size:(CGSize)size
-                backgroundColor:(UIColor *)backgroundColor;
+                backgroundColor:(UIColor *)backgroundColor
+                backgroundImage:(UIImage *)backgroundImage;
 
 /// 绘制顶点，顶点是归一化的坐标
 - (void)drawPoints:(NSArray <NSValue *>*)points;

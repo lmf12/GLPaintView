@@ -30,6 +30,9 @@ static NSInteger const kDefaultBrushSize = 40;
 
 @property (nonatomic, strong) EAGLContext *context;
 
+@property (nonatomic, strong) UIColor *backgroundColor; /// 纹理背景色
+@property (nonatomic, strong) UIImage *backgroundImage; /// 纹理图片
+
 @property (nonatomic, assign) GLuint frameBuffer; // 帧缓存
 @property (nonatomic, assign) GLuint renderBuffer; // 渲染缓存
 @property (nonatomic, assign) GLuint vertexBuffer; // 顶点缓存
@@ -71,14 +74,34 @@ static NSInteger const kDefaultBrushSize = 40;
 
 - (instancetype)initWithFrame:(CGRect)frame
                   textureSize:(CGSize)textureSize
-       textureBackgroundColor:(UIColor *)textureBackgroundColor {
+              backgroundColor:(UIColor *)backgroundColor
+              backgroundImage:(UIImage *)backgroundImage {
     self = [super initWithFrame:frame];
     if (self) {
         self.textureSize = textureSize;
-        self.textureBackgroundColor = textureBackgroundColor;
+        self.backgroundColor = backgroundColor;
+        self.backgroundImage = backgroundImage;
         [self commonInit];
     }
     return self;
+}
+
+- (instancetype)initWithFrame:(CGRect)frame
+                  textureSize:(CGSize)textureSize
+              backgroundColor:(UIColor *)backgroundColor {
+    return [self initWithFrame:frame
+                   textureSize:textureSize
+               backgroundColor:backgroundColor
+               backgroundImage:nil];
+}
+
+- (instancetype)initWithFrame:(CGRect)frame
+                  textureSize:(CGSize)textureSize
+              backgroundImage:(UIImage *)backgroundImage {
+    return [self initWithFrame:frame
+                   textureSize:textureSize
+               backgroundColor:[UIColor whiteColor]
+               backgroundImage:backgroundImage];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -234,13 +257,13 @@ static NSInteger const kDefaultBrushSize = 40;
 - (void)setBrushColor:(UIColor *)brushColor {
     _brushColor = brushColor;
     
-    [self setBrushMode:MFPaintViewBrushModePaint];
+    [self.paintTexture setColor:brushColor];
+    [self setBrushMode:GLPaintViewBrushModePaint];
 }
 
 - (void)setBrushMode:(GLPaintViewBrushMode)brushMode {
     _brushMode = brushMode;
-    
-    [self.paintTexture setColor:brushMode == MFPaintViewBrushModeEraser ? self.textureBackgroundColor : self.brushColor];
+    self.paintTexture.brushMode = (GLPaintTextureBrushMode)brushMode;
 }
 
 - (void)setBrushImageName:(NSString *)brushImageName {
@@ -277,12 +300,13 @@ static NSInteger const kDefaultBrushSize = 40;
     
     self.paintTexture = [[GLPaintTexture alloc] initWithContext:self.context
                                                            size:self.textureSize
-                                                backgroundColor:self.textureBackgroundColor];
+                                                backgroundColor:self.backgroundColor
+                                                backgroundImage:self.backgroundImage];
     [self bindTexture];
     
     self.brushSize = kDefaultBrushSize;
     self.brushColor = [UIColor blackColor];
-    self.brushMode = MFPaintViewBrushModePaint;
+    self.brushMode = GLPaintViewBrushModePaint;
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self clear];
@@ -341,6 +365,8 @@ static NSInteger const kDefaultBrushSize = 40;
 
 // 绘制
 - (void)display {
+    glDisable(GL_BLEND);
+    
     glViewport(0, 0, [self drawableWidth], [self drawableHeight]); // 绘制前先切换 Viewport
     
     glBindFramebuffer(GL_FRAMEBUFFER, self.frameBuffer);

@@ -54,9 +54,10 @@
     CGFloat ratio = self.view.frame.size.height / self.view.frame.size.width;
     CGFloat width = 1500;
     CGSize textureSize = CGSizeMake(width, width * ratio);
+    UIImage *image = [UIImage imageNamed:@"paper.jpg"];
     self.paintView = [[GLPaintView alloc] initWithFrame:self.view.bounds
                                             textureSize:textureSize
-                                 textureBackgroundColor:[UIColor colorWithWhite:0.9 alpha:1]];
+                                        backgroundImage:image];
     self.paintView.delegate = self;
     [self.view addSubview:self.paintView];
 }
@@ -215,7 +216,7 @@
     self.clearButton.enabled = [self.paintView canUndo];
     self.saveButton.enabled = [self.paintView canUndo];
     
-    NSString *title = self.paintView.brushMode == MFPaintViewBrushModePaint ? @"橡皮擦" : @"画笔";
+    NSString *title = self.paintView.brushMode == GLPaintViewBrushModePaint ? @"橡皮擦" : @"画笔";
     [self.brushButton setTitle:title forState:UIControlStateNormal];
 }
 
@@ -258,10 +259,10 @@
 }
 
 - (void)brushAction:(id)sender {
-    if (self.paintView.brushMode == MFPaintViewBrushModePaint) {
-        self.paintView.brushMode = MFPaintViewBrushModeEraser;
+    if (self.paintView.brushMode == GLPaintViewBrushModePaint) {
+        self.paintView.brushMode = GLPaintViewBrushModeEraser;
     } else {
-        self.paintView.brushMode = MFPaintViewBrushModePaint;
+        self.paintView.brushMode = GLPaintViewBrushModePaint;
     }
     [self refreshUI];
 }
