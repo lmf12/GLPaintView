@@ -23,6 +23,7 @@
 		E86CCEDE233E6AD0007DF53E /* GLPaintTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = E86CCEDD233E6AD0007DF53E /* GLPaintTexture.m */; };
 		E86CCEE1233E7A45007DF53E /* normal.fsh in Resources */ = {isa = PBXBuildFile; fileRef = E86CCEDF233E7A45007DF53E /* normal.fsh */; };
 		E86CCEE2233E7A45007DF53E /* normal.vsh in Resources */ = {isa = PBXBuildFile; fileRef = E86CCEE0233E7A45007DF53E /* normal.vsh */; };
+		E87906B5250CB15C001B134F /* GLPaintManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E87906B4250CB15C001B134F /* GLPaintManager.m */; };
 		E89EB9AB233F5DD100BB87D8 /* UIColor+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = E89EB9AA233F5DD100BB87D8 /* UIColor+Extension.m */; };
 		E8C5BFC624251D9A007BC2BA /* paper.jpg in Resources */ = {isa = PBXBuildFile; fileRef = E8C5BFC524251D9A007BC2BA /* paper.jpg */; };
 		E8EAA81223361C3800E1B0E8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E8EAA81123361C3800E1B0E8 /* AppDelegate.m */; };
@@ -59,6 +60,8 @@
 		E86CCEDD233E6AD0007DF53E /* GLPaintTexture.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GLPaintTexture.m; sourceTree = "<group>"; };
 		E86CCEDF233E7A45007DF53E /* normal.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = normal.fsh; sourceTree = "<group>"; };
 		E86CCEE0233E7A45007DF53E /* normal.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = normal.vsh; sourceTree = "<group>"; };
+		E87906B3250CB15C001B134F /* GLPaintManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GLPaintManager.h; sourceTree = "<group>"; };
+		E87906B4250CB15C001B134F /* GLPaintManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GLPaintManager.m; sourceTree = "<group>"; };
 		E89EB9A9233F5DD100BB87D8 /* UIColor+Extension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIColor+Extension.h"; sourceTree = "<group>"; };
 		E89EB9AA233F5DD100BB87D8 /* UIColor+Extension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Extension.m"; sourceTree = "<group>"; };
 		E8C5BFC524251D9A007BC2BA /* paper.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = paper.jpg; sourceTree = "<group>"; };
@@ -88,6 +91,7 @@
 		E80B83862336273700BA9CE7 /* GLPaintView */ = {
 			isa = PBXGroup;
 			children = (
+				E87906B2250CB13D001B134F /* Manager */,
 				E83F060823B718CF00162B8D /* Model */,
 				E89EB9A8233F5DA200BB87D8 /* Category */,
 				E80B83982337841C00BA9CE7 /* Image */,
@@ -150,6 +154,15 @@
 				E83F060D23B719AF00162B8D /* MFPaintModel.m */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		E87906B2250CB13D001B134F /* Manager */ = {
+			isa = PBXGroup;
+			children = (
+				E87906B3250CB15C001B134F /* GLPaintManager.h */,
+				E87906B4250CB15C001B134F /* GLPaintManager.m */,
+			);
+			path = Manager;
 			sourceTree = "<group>";
 		};
 		E89EB9A8233F5DA200BB87D8 /* Category */ = {
@@ -287,6 +300,7 @@
 				E89EB9AB233F5DD100BB87D8 /* UIColor+Extension.m in Sources */,
 				E8EAA82023361C3800E1B0E8 /* main.m in Sources */,
 				E8EAA81223361C3800E1B0E8 /* AppDelegate.m in Sources */,
+				E87906B5250CB15C001B134F /* GLPaintManager.m in Sources */,
 				E84DBB6923A4E19B00797D0B /* SelectionView.m in Sources */,
 				E86CCEDE233E6AD0007DF53E /* GLPaintTexture.m in Sources */,
 				E84DBB6F23A4EA7300797D0B /* SelectionModel.m in Sources */,

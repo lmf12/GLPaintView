@@ -10,6 +10,7 @@
 #import "MFBezierCurvesTool.h"
 #import "MFShaderHelper.h"
 #import "MFPaintStack.h"
+#import "GLPaintManager.h"
 
 #import "GLPaintView.h"
 
@@ -27,8 +28,6 @@ static NSInteger const kDefaultBrushSize = 40;
 @interface GLPaintView ()
 
 @property (nonatomic, strong) GLPaintTexture *paintTexture;
-
-@property (nonatomic, strong) EAGLContext *context;
 
 @property (nonatomic, strong) UIColor *backgroundColor; /// 纹理背景色
 @property (nonatomic, strong) UIImage *backgroundImage; /// 纹理图片
@@ -57,10 +56,6 @@ static NSInteger const kDefaultBrushSize = 40;
 @implementation GLPaintView
 
 - (void)dealloc {
-    if ([EAGLContext currentContext] == self.context) {
-        [EAGLContext setCurrentContext:nil];
-    }
-    
     if (_vertices) {
         free(_vertices);
         _vertices = nil;
@@ -275,12 +270,11 @@ static NSInteger const kDefaultBrushSize = 40;
 #pragma mark - Private
 
 - (void)commonInit {
+    [EAGLContext setCurrentContext:[GLPaintManager sharedPaintContext]];
+    
     self.operationStack = [[MFPaintStack alloc] init];
     self.undoOperationStack = [[MFPaintStack alloc] init];
     self.pointsPreDraw = [[NSMutableArray alloc] init];
-    
-    self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-    [EAGLContext setCurrentContext:self.context];
     
     self.vertices = malloc(sizeof(Vertex) * 4);
     self.vertices[0] = (Vertex){{-1, 1, 0}, {0, 1}};
@@ -298,10 +292,9 @@ static NSInteger const kDefaultBrushSize = 40;
         self.textureSize = CGSizeMake(self.drawableWidth, self.drawableHeight);
     }
     
-    self.paintTexture = [[GLPaintTexture alloc] initWithContext:self.context
-                                                           size:self.textureSize
-                                                backgroundColor:self.backgroundColor
-                                                backgroundImage:self.backgroundImage];
+    self.paintTexture = [[GLPaintTexture alloc] initWithSize:self.textureSize
+                                             backgroundColor:self.backgroundColor
+                                             backgroundImage:self.backgroundImage];
     [self bindTexture];
     
     self.brushSize = kDefaultBrushSize;
@@ -338,7 +331,8 @@ static NSInteger const kDefaultBrushSize = 40;
 // 绑定图像要输出的 layer
 - (void)bindRenderLayer:(CALayer <EAGLDrawable> *)layer {
     glBindRenderbuffer(GL_RENDERBUFFER, self.renderBuffer);
-    [self.context renderbufferStorage:GL_RENDERBUFFER fromDrawable:layer];
+    [[GLPaintManager sharedPaintContext] renderbufferStorage:GL_RENDERBUFFER
+                                                fromDrawable:layer];
     
     glBindFramebuffer(GL_FRAMEBUFFER, self.frameBuffer);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER,
@@ -388,7 +382,7 @@ static NSInteger const kDefaultBrushSize = 40;
     
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-    [self.context presentRenderbuffer:GL_RENDERBUFFER];
+    [[GLPaintManager sharedPaintContext] presentRenderbuffer:GL_RENDERBUFFER];
 }
 
 // 获取渲染缓存宽度

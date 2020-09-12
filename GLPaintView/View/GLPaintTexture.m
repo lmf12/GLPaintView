@@ -6,8 +6,8 @@
 //  Copyright © 2019年 Lyman Li. All rights reserved.
 //
 
+#import "GLPaintManager.h"
 #import "MFShaderHelper.h"
-
 #import "UIColor+Extension.h"
 
 #import "GLPaintTexture.h"
@@ -34,8 +34,6 @@ typedef struct {
 @property (nonatomic, assign) int currentVertexSize; // 记录顶点数组的容量，当容量不足的时候才扩容，避免频繁申请内存空间
 @property (nonatomic, assign) int vertexCount;  //  顶点数
 
-@property (nonatomic, strong) EAGLContext *context;
-
 @property (nonatomic, assign) GLuint frameBuffer; // 帧缓存
 @property (nonatomic, assign) GLuint renderBuffer; // 渲染缓存
 @property (nonatomic, assign) GLuint vertexBuffer; // 顶点缓存
@@ -51,10 +49,6 @@ typedef struct {
 @implementation GLPaintTexture
 
 - (void)dealloc {
-    if ([EAGLContext currentContext] == self.context) {
-        [EAGLContext setCurrentContext:nil];
-    }
-    
     if (_vertices) {
         free(_vertices);
         _vertices = nil;
@@ -91,13 +85,11 @@ typedef struct {
     [self deleteBuffers];
 }
 
-- (instancetype)initWithContext:(EAGLContext *)context
-                           size:(CGSize)size
-                backgroundColor:(UIColor *)backgroundColor
-                backgroundImage:(UIImage *)backgroundImage{
+- (instancetype)initWithSize:(CGSize)size
+             backgroundColor:(UIColor *)backgroundColor
+             backgroundImage:(UIImage *)backgroundImage{
     self = [super init];
     if (self) {
-        self.context = context;
         self.size = size;
         self.backgroundColor = backgroundColor;
         self.backgroundImage = backgroundImage;
@@ -202,6 +194,8 @@ typedef struct {
 #pragma mark - Private
 
 - (void)commonInit {
+    [EAGLContext setCurrentContext:[GLPaintManager sharedPaintContext]];
+    
     self.brushTextureCache = [[NSMutableDictionary alloc] init];
     self.brushMode = GLPaintTextureBrushModePaint;
     

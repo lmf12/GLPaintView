@@ -32,10 +32,9 @@ typedef NS_ENUM(NSUInteger, GLPaintTextureBrushMode) {
 @property (nonatomic, assign) GLPaintTextureBrushMode brushMode;
 
 /// 初始化
-- (instancetype)initWithContext:(EAGLContext *)context
-                           size:(CGSize)size
-                backgroundColor:(UIColor *)backgroundColor
-                backgroundImage:(UIImage *)backgroundImage;
+- (instancetype)initWithSize:(CGSize)size
+             backgroundColor:(UIColor *)backgroundColor
+             backgroundImage:(UIImage *)backgroundImage;
 
 /// 绘制顶点，顶点是归一化的坐标
 - (void)drawPoints:(NSArray <NSValue *>*)points;
