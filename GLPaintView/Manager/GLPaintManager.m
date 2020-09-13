@@ -12,12 +12,21 @@ static void *GLPaintQueueKey;
 
 @implementation GLPaintManager
 
-void runAsynOnPaintRenderQueue(void (^block)(void)) {
+void runAsyncOnPaintRenderQueue(void (^block)(void)) {
     dispatch_queue_t queue = [GLPaintManager sharedRenderQueue];
     if (dispatch_get_specific(GLPaintQueueKey)) {
         block();
     } else {
         dispatch_async(queue, block);
+    }
+}
+
+void runSyncOnPaintRenderQueue(void (^block)(void)) {
+    dispatch_queue_t queue = [GLPaintManager sharedRenderQueue];
+    if (dispatch_get_specific(GLPaintQueueKey)) {
+        block();
+    } else {
+        dispatch_sync(queue, block);
     }
 }
 

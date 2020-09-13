@@ -12,7 +12,10 @@
 @interface GLPaintManager : NSObject
 
 /// 在渲染线程异步执行
-void runAsynOnPaintRenderQueue(void (^block)(void));
+void runAsyncOnPaintRenderQueue(void (^block)(void));
+
+/// 在渲染线程同步执行
+void runSyncOnPaintRenderQueue(void (^block)(void));
 
 /// OpenGL 上下文
 + (EAGLContext *)sharedPaintContext;
