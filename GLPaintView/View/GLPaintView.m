@@ -295,7 +295,6 @@ static NSInteger const kDefaultBrushSize = 40;
     self.paintTexture = [[GLPaintTexture alloc] initWithSize:self.textureSize
                                              backgroundColor:self.backgroundColor
                                              backgroundImage:self.backgroundImage];
-    [self bindTexture];
     
     self.brushSize = kDefaultBrushSize;
     self.brushColor = [UIColor blackColor];
@@ -341,16 +340,6 @@ static NSInteger const kDefaultBrushSize = 40;
                               self.renderBuffer);
 }
 
-// 绑定要绘制的纹理
-- (void)bindTexture {
-    glUseProgram(self.program);
-    GLuint textureSlot = glGetUniformLocation(self.program, "Texture");
-    
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, self.paintTexture.textureID);
-    glUniform1i(textureSlot, 1);
-}
-
 // 绘制数据到屏幕
 - (void)drawPointsToScreen:(NSArray<NSValue *> *)points {
     [self.paintTexture drawPoints:points];
@@ -364,8 +353,14 @@ static NSInteger const kDefaultBrushSize = 40;
     glViewport(0, 0, [self drawableWidth], [self drawableHeight]); // 绘制前先切换 Viewport
     
     glBindFramebuffer(GL_FRAMEBUFFER, self.frameBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, self.renderBuffer);
     
     glUseProgram(self.program);
+    GLuint textureSlot = glGetUniformLocation(self.program, "Texture");
+    
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, self.paintTexture.textureID);
+    glUniform1i(textureSlot, 1);
     
     GLuint positionSlot = glGetAttribLocation(self.program, "Position");
     GLuint textureCoordsSlot = glGetAttribLocation(self.program, "TextureCoords");
@@ -381,6 +376,7 @@ static NSInteger const kDefaultBrushSize = 40;
     glVertexAttribPointer(textureCoordsSlot, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL + offsetof(Vertex, textureCoord));
     
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glFlush();
 
     [[GLPaintManager sharedPaintContext] presentRenderbuffer:GL_RENDERBUFFER];
 }

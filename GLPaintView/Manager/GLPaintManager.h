@@ -11,6 +11,9 @@
 /// 做线程和上下文管理
 @interface GLPaintManager : NSObject
 
+/// 在渲染线程异步执行
+void runAsynOnPaintRenderQueue(void (^block)(void));
+
 /// OpenGL 上下文
 + (EAGLContext *)sharedPaintContext;
 

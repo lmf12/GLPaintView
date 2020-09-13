@@ -35,7 +35,6 @@ typedef struct {
 @property (nonatomic, assign) int vertexCount;  //  顶点数
 
 @property (nonatomic, assign) GLuint frameBuffer; // 帧缓存
-@property (nonatomic, assign) GLuint renderBuffer; // 渲染缓存
 @property (nonatomic, assign) GLuint vertexBuffer; // 顶点缓存
 
 @property (nonatomic, assign) GLuint brushProgram; // 绘画着色器程序
@@ -229,7 +228,6 @@ typedef struct {
 // 创建 buffer
 - (void)genBuffers {
     glGenFramebuffers(1, &_frameBuffer);
-    glGenRenderbuffers(1, &_renderBuffer);
     glGenBuffers(1, &_vertexBuffer);
 }
 
@@ -299,12 +297,8 @@ typedef struct {
 // 清除 buffer
 - (void)deleteBuffers {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
     if (_frameBuffer != 0) {
         glDeleteFramebuffers(1, &_frameBuffer);
-    }
-    if (_renderBuffer != 0) {
-        glDeleteRenderbuffers(1, &_renderBuffer);
     }
     if (_vertexBuffer != 0) {
         glDeleteBuffers(1, &_vertexBuffer);
@@ -343,6 +337,7 @@ typedef struct {
     glVertexAttribPointer(positionSlot, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL + offsetof(Vertex, positionCoord));
     
     glDrawArrays(GL_POINTS, 0, self.vertexCount);
+    glFlush();
 }
 
 // 绘制背景颜色和背景图片
@@ -373,6 +368,7 @@ typedef struct {
         glVertexAttribPointer(textureSlot, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3* sizeof(float)));
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
+    glFlush();
 }
 
 // 绘制绘画的结果
@@ -397,6 +393,7 @@ typedef struct {
     glEnableVertexAttribArray(textureSlot);
     glVertexAttribPointer(textureSlot, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3* sizeof(float)));
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glFlush();
 }
 
 // 获取图片
