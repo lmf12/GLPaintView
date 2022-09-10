@@ -1,4 +1,4 @@
-<div align=center><img src="https://lymanli-1258009115.cos.ap-guangzhou.myqcloud.com/image/github/GLPaintView/title.jpg" width="450"/></div>
+<div align=center><img src="https://github.com/lmf12/ImageHost/blob/master/GLPaintView/title.jpg" width="450"/></div>
 
 # 简介
 
@@ -8,7 +8,7 @@
 
 # 效果预览
 
-![](https://lymanli-1258009115.cos.ap-guangzhou.myqcloud.com/image/github/GLPaintView/image.gif)
+![](https://github.com/lmf12/ImageHost/blob/master/GLPaintView/image.gif)
 
 # 如何导入
 
